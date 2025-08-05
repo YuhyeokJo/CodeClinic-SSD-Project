@@ -1,16 +1,31 @@
 import pytest
+import sys
+from pathlib import Path
 
-
-def test_write_when_ssd_nand_text_exists():
-    """
-    write 명령어시 ssd_nand.txt 파일에 값을 저장 해 둔다
-    """
-    ...
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from device.ssd import SSD
 
 
 def test_write_when_no_ssd_nand_text_create_then_write():
     """
     ssd_nand.txt 파일이 없는 경우, 생성 후 데이터가 기록되어야 한다.
+    """
+    ssd = SSD()
+    Path(ssd.ssd_nand_file).unlink()
+    cmd = "W"
+    address = 2
+    value = 0xAAAABBBB
+    ssd.write(cmd, address, value)
+
+    with open(ssd.ssd_nand_file, "r") as f:
+        lines = f.readlines()[0]
+
+    assert lines == f"{address} {hex(value)}\n"
+
+
+def test_write_when_ssd_nand_text_exists():
+    """
+    write 명령어시 ssd_nand.txt 파일에 값을 저장 해 둔다
     """
 
 
