@@ -1,13 +1,12 @@
 from shell.driver import SSDDriver
+from shell.command import Command
 
-
-class Fullread:
+class Fullread(Command):
     def __init__(self, driver: SSDDriver):
         self.driver = driver
 
-    def run(self):
-        result = {}
+    def execute(self, arg=None) -> str:
+        result = ""
         for lba in range(100):
-            result[lba] = self.driver.read(str(lba))
-
+            result += f"\n [Write] LBA {lba} : {self.driver.read(str(lba))}"
         return result
