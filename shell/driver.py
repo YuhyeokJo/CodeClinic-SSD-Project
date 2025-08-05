@@ -1,7 +1,7 @@
 class SSDDriver:
-    def read(self, lba: str, data: str):
+    def read(self, lba: str):
         pass
 
 
-    def write(self):
+    def write(self, lba: str, data: str):
         pass
