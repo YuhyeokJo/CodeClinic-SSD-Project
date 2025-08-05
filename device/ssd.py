@@ -9,7 +9,7 @@ class SSD(Device):
         self.ssd_nand_file = self.output_dir / "ssd_nand.txt"
 
     def write(self, cmd, address, value):
-        with open(self.ssd_nand_file, "w") as f:
+        with open(self.ssd_nand_file, "a") as f:
             f.writelines(f"{address} {hex(value)}\n")
 
     def read(self, cmd, address):
