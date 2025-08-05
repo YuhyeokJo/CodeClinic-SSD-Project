@@ -18,5 +18,5 @@ class Fullread(Command):
             if not re.fullmatch(r'0x[0-9A-Fa-f]+', data):
                 print("Error: DATA must be a valid hex (0x + 0~9A~F)")
                 return "INVALID COMMAND"
-            result += f"\n [Write] LBA {lba} : {data}"
+            result += f"\n [Read] LBA {lba} : {data}"
         return result
