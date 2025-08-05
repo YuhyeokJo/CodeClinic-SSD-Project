@@ -41,10 +41,6 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd):
 
 
 def test_write_when_ssd_nand_text_exists(ssd):
-    # arrange
-    with open(ssd.ssd_nand_file, "w") as f:
-        pass
-
     # act
     cmd1 = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
     ssd.write(cmd1.cmd, cmd1.address, cmd1.value)
