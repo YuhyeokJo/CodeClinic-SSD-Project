@@ -1,26 +1,43 @@
 import pytest
 import sys
+import shutil
+
 from pathlib import Path
+from dataclasses import dataclass
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from device.ssd import SSD
 
 
-def test_write_when_no_ssd_nand_text_create_then_write():
+@dataclass
+class WriteCommand:
+    cmd: str
+    address: int
+    value: int | str
+
+
+@pytest.fixture
+def ssd():
+    ssd_instance = SSD()
+    shutil.rmtree(ssd_instance.output_dir, ignore_errors=True)
+    return SSD()
+
+
+def test_write_when_no_ssd_nand_text_create_then_write(ssd):
     """
     ssd_nand.txt 파일이 없는 경우, 생성 후 데이터가 기록되어야 한다.
     """
-    ssd = SSD()
-    Path(ssd.ssd_nand_file).unlink()
-    cmd = "W"
-    address = 2
-    value = 0xAAAABBBB
-    ssd.write(cmd, address, value)
+    # arrange
+    cmd = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
+
+    # act
+    ssd.write(cmd.cmd, cmd.address, cmd.value)
 
     with open(ssd.ssd_nand_file, "r") as f:
         lines = f.readlines()[0]
 
-    assert lines == f"{address} {hex(value)}\n"
+    # assert
+    assert lines == f"{cmd.address} {hex(cmd.value)}\n"
 
 
 def test_write_when_ssd_nand_text_exists():
@@ -31,13 +48,13 @@ def test_write_when_ssd_nand_text_exists():
 
 def test_read_creates_ssd_output_text_and_read_value():
     """
-    write 명령어시 ssd_nand.txt 파일에 값을 저장 해 둔다
-    ssd_nand.txt 파일이 없는 경우, 생성 후 데이터가 기록되어야 한다.
+    Read 명령어는 ssd_nand.txt에서 데이터를 읽고,
+    읽은데이터를ssd_output.txt 파일에 기록한다.
     """
     ...
 
 
-def test_read_output_should_be_gone():
+def test_read_origin_ssd_output_should_be_gone():
     """
      ssd_output.txt 에 읽은 값이 적힌다. (기존 데이터는 사라진다.)
     """
