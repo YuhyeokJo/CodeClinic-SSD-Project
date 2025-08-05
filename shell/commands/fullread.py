@@ -8,6 +8,10 @@ class Fullread(Command):
         self.driver = driver
 
     def execute(self, arg=None) -> str:
+        if arg:
+            print("Error: invalid arg.")
+            return "INVALID COMMAND"
+
         result = ""
         for lba in range(100):
             data = self.driver.read(str(lba))
