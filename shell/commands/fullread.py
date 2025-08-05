@@ -7,8 +7,7 @@ class Fullread:
 
     def run(self):
         result = {}
-        for i in range(100):
-            result[i] = self.driver.read(i)
-            print(i, result[i])
+        for lba in range(100):
+            result[lba] = self.driver.read(str(lba))
 
         return result
