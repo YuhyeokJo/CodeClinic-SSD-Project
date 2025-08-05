@@ -20,8 +20,13 @@ def test_write_correctly(capsys, mocker: MockerFixture):
     #assert
     assert actual == "[WRITE] Done"
 
-
-def test_write_wrongly_with_minus_lba(mocker: MockerFixture):
+@pytest.mark.parametrize(
+    "wrong_argument", [
+        ["-1", "0x00000001"],
+        ["-1", "0x00000001", "additional"],
+    ]
+)
+def test_write_wrongly_with_minus_lba(mocker: MockerFixture, wrong_argument):
     """
     음수 lba가 전달되면 INVALID COMMAND를 반환해야 함
     """
@@ -30,8 +35,9 @@ def test_write_wrongly_with_minus_lba(mocker: MockerFixture):
     mocked_ssd.write.return_value = True
     write_command = WriteCommand(mocked_ssd)
 
-    #act
-    actual = write_command.execute(["-1", "0x00000001"])
+    for wrong_arg in wrong_argument:
+        #act
+        actual = write_command.execute(wrong_arg)
 
-    #assert
-    assert actual == "INVALID COMMAND"
+        #assert
+        assert actual == "INVALID COMMAND"
