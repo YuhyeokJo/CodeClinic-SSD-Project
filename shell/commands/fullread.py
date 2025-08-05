@@ -1,5 +1,7 @@
+import re
 from shell.driver import SSDDriver
 from shell.command import Command
+
 
 class Fullread(Command):
     def __init__(self, driver: SSDDriver):
@@ -8,5 +10,9 @@ class Fullread(Command):
     def execute(self, arg=None) -> str:
         result = ""
         for lba in range(100):
-            result += f"\n [Write] LBA {lba} : {self.driver.read(str(lba))}"
+            data = self.driver.read(str(lba))
+            if not re.fullmatch(r'0x[0-9A-Fa-f]+', data):
+                print("Error: DATA must be a valid hex (0x + 0~9A~F)")
+                return "INVALID COMMAND"
+            result += f"\n [Write] LBA {lba} : {data}"
         return result

@@ -5,6 +5,8 @@ from shell.commands.fullread import Fullread
 
 def test_fullread_count(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
+    expected_output = [f"0x{lba:08X}" for lba in range(100)]
+    driver.read.side_effect = expected_output
     full_reader = Fullread(driver)
     full_reader.execute()
     assert driver.read.call_count == 100
