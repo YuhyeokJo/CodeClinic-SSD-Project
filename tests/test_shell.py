@@ -10,7 +10,7 @@ def test_full_write_command_success(mocker: MockerFixture):
     driver.write.return_value = True
     full_write_command = FullWrite(driver)
 
-    assert full_write_command.execute(['0xABCDFFFF'])
+    assert full_write_command.execute(['0xABCDFFFF']) == "[Full Write] Done"
     assert driver.write.call_count == 100
 
     called_lbas = [call.args[0] for call in driver.write.call_args_list]
@@ -21,11 +21,11 @@ def test_full_write_command_fail_empty_data(mocker: MockerFixture):
     driver.write.return_value = False
     full_write_command = FullWrite(driver)
 
-    assert full_write_command.execute([]) is False
+    assert full_write_command.execute([]) == "INVALID COMMAND"
 
 def test_full_write_command_fail_wrong_data(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     driver.write.return_value = False
     full_write_command = FullWrite(driver)
 
-    assert full_write_command.execute(['0xAABCDFFFFFFF']) is False
+    assert full_write_command.execute(['0xAABCDFFFFFFF']) == "INVALID COMMAND"
