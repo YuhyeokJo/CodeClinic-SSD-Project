@@ -31,7 +31,7 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd):
     cmd = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
 
     # act
-    ssd.write(cmd.cmd, cmd.address, cmd.value)
+    ssd.write(cmd.address, cmd.value)
 
     with open(ssd.ssd_nand_file, "r") as f:
         lines = f.readlines()[0]
@@ -43,10 +43,10 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd):
 def test_write_when_ssd_nand_text_exists(ssd):
     # act
     cmd1 = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
-    ssd.write(cmd1.cmd, cmd1.address, cmd1.value)
+    ssd.write(cmd1.address, cmd1.value)
 
     cmd2 = WriteCommand(cmd="W", address=3, value=0xAAAABBBB)
-    ssd.write(cmd2.cmd, cmd2.address, cmd2.value)
+    ssd.write(cmd2.address, cmd2.value)
 
     with open(ssd.ssd_nand_file, "r") as f:
         line1, line2 = f.readlines()
@@ -58,10 +58,10 @@ def test_write_when_ssd_nand_text_exists(ssd):
 def test_write_when_same_address(ssd):
     # act
     cmd1 = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
-    ssd.write(cmd1.cmd, cmd1.address, cmd1.value)
+    ssd.write(cmd1.address, cmd1.value)
 
     cmd2 = WriteCommand(cmd="W", address=2, value=0xFFFFFFFF)
-    ssd.write(cmd2.cmd, cmd2.address, cmd2.value)
+    ssd.write(cmd2.address, cmd2.value)
 
     data = dict()
     with open(ssd.ssd_nand_file, "r") as f:
@@ -77,7 +77,7 @@ def test_read_init_value_should_be_0x00000000(ssd):
     """
     기록이 한적이 없는 LBA를 읽으면 0x00000000 으로 읽힌다.
     """
-    ssd.read("R", 0)
+    ssd.read(0)
     data = {}
     with open(ssd.ssd_output_file, "r") as f:
         for line in f:

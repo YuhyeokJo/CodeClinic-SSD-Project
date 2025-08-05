@@ -10,7 +10,7 @@ class SSD(Device):
         self.ssd_nand_file = self.output_dir / "ssd_nand.txt"
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
 
-    def write(self, cmd: str, address: int | str, value: int | str):
+    def write(self, address: int | str, value: int | str):
         data = {}
         if os.path.exists(self.ssd_nand_file):
             with open(self.ssd_nand_file, "r") as f:
@@ -23,11 +23,7 @@ class SSD(Device):
             for addr, val in sorted(data.items()):
                 f.write(f"{addr} {val}\n")
 
-    def read(self, cmd, address):
-        """
-            Read 명령어는 ssd_nand.txt에서 데이터를 읽고,
-            읽은데이터를ssd_output.txt 파일에 기록한다.
-        """
+    def read(self, address):
         data = {}
         if os.path.exists(self.ssd_nand_file):
             with open(self.ssd_nand_file, "r") as f:
