@@ -17,7 +17,7 @@ class SSD(Device):
                 for line in f:
                     addr, val = line.rstrip().split()
                     data[str(addr)] = val
-        data[str(address)] = hex(value)
+        data[str(address)] = value if isinstance(value, str) else hex(value)
 
         with open(self.ssd_nand_file, "w") as f:
             for addr, val in sorted(data.items()):

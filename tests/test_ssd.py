@@ -1,11 +1,8 @@
 import pytest
-import sys
 import shutil
 
-from pathlib import Path
 from dataclasses import dataclass
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
 from device.ssd import SSD
 
 
