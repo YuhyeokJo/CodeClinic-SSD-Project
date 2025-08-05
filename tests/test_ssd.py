@@ -52,7 +52,25 @@ def test_write_when_ssd_nand_text_exists(ssd):
         line1, line2 = f.readlines()
 
     # assert
-    assert line1+line2 == f"{cmd1.address} {hex(cmd1.value)}\n{cmd2.address} {hex(cmd2.value)}\n"
+    assert line1 + line2 == f"{cmd1.address} {hex(cmd1.value)}\n{cmd2.address} {hex(cmd2.value)}\n"
+
+
+def test_write_when_same_address(ssd):
+    # act
+    cmd1 = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
+    ssd.write(cmd1.cmd, cmd1.address, cmd1.value)
+
+    cmd2 = WriteCommand(cmd="W", address=2, value=0xFFFFFFFF)
+    ssd.write(cmd2.cmd, cmd2.address, cmd2.value)
+
+    data = dict()
+    with open(ssd.ssd_nand_file, "r") as f:
+        for line in f:
+            address, val = line.rstrip().split(' ')
+            data[str(address)] = val
+
+    # assert
+    assert data['2'] == '0xffffffff'
 
 
 def test_read_creates_ssd_output_text_and_read_value():
