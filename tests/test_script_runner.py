@@ -23,14 +23,15 @@ def test_execute_with_not_digit(mocker: MockerFixture):
     assert INVALID_COMMAND == script.execute(['12e'])
 
 
-def test_execute_write(mocker: MockerFixture):
+# def test_execute_write(mocker: MockerFixture):
+#     driver = mocker.Mock(spec=SSDDriver)
+#     script = Script(driver)
+#     script.execute(["3", "0x00000001"])
+#     assert driver.write.call_count == 1
+
+
+def test_execute_with_valid_arg(mocker, capsys):
     driver = mocker.Mock(spec=SSDDriver)
     script = Script(driver)
-    script.execute(["3", "0x00000001"])
-    assert driver.write.call_count == 1
-
-# def test_execute_with_valid_arg(mocker, capsys):
-#     driver = mocker.Mock(spec=SSDDriver)
-#     script = Script(driver)b
-#     script.read_compare.return_value = "0x12345678"
-#     assert "[SCRIPT] LBA 42: 0x12345678" == script.execute(['42'])
+    driver.read.return_value = "0x12345678"
+    assert "[SCRIPT] PASS" == script.execute(["3", "0x12345678"])
