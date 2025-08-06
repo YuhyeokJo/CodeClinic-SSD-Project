@@ -13,10 +13,21 @@ def test_full_write_and_read_compare_count(mocker: MockerFixture):
     assert driver.read.call_count == 100
 
 
-def test_full_write_and_read_compare_result(mocker: MockerFixture):
+def test_full_write_and_read_compare_pass(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)
     group_size = 5
     inputs = script_runner._make_input_full_write_and_read_compare(group_size)
     driver.read.side_effect = list(inputs.values())
     assert script_runner.full_write_and_read_compare() == "[SCRIPT] PASS"
+
+
+def test_full_write_and_read_compare_fail(mocker: MockerFixture):
+    driver = mocker.Mock(spec=SSDDriver)
+    script_runner = ScriptRunner(driver)
+    group_size = 5
+    inputs = script_runner._make_input_full_write_and_read_compare(group_size)
+    input_values = list(inputs.values())
+    input_values[3] = "0x00000000"
+    driver.read.side_effect = input_values
+    assert script_runner.full_write_and_read_compare() == "[SCRIPT] FAIL"
