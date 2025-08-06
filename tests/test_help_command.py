@@ -61,11 +61,11 @@ def test_help_unknown_command_success(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
 
     help_command = Help(driver)
-    assert help_command.execute(['red']) == f"Unknown command: red"
+    assert help_command.execute(['red']) == "INVALID COMMAND"
 
 
 def test_help_empty_command_success(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
 
     help_command = Help(driver)
-    assert help_command.execute([]) == """Available commands:\n- read\n- write\n- fullread\n- fullwrite\n- exit"""
+    assert help_command.execute([]) == "INVALID COMMAND"
