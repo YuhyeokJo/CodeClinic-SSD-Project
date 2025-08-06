@@ -1,3 +1,5 @@
+import random
+
 from pytest_mock import MockerFixture
 from shell.driver import SSDDriver
 from scripts.script_runner import ScriptRunner
@@ -55,3 +57,31 @@ def test_partial_lba_write_fail(mocker: MockerFixture):
     input_values[3] = "0x00000000"
     driver.read.side_effect = input_values
     assert script_runner.partial_lba_write() == "[SCRIPT] FAIL"
+
+
+def test_write_read_aging_count(mocker: MockerFixture):
+    driver = mocker.Mock(spec=SSDDriver)
+    script_runner = ScriptRunner(driver)
+    script_runner.write_read_aging()
+    assert driver.write.call_count == 400
+    assert driver.read.call_count == 400
+
+
+def test_write_read_aging_pass(mocker: MockerFixture):
+    driver = mocker.Mock(spec=SSDDriver)
+    script_runner = ScriptRunner(driver)
+    random.seed(42)
+    value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
+    driver.read.side_effect = [value] * 400
+    assert script_runner.write_read_aging() == "[SCRIPT] PASS"
+
+
+def test_write_read_aging_fail(mocker: MockerFixture):
+    driver = mocker.Mock(spec=SSDDriver)
+    script_runner = ScriptRunner(driver)
+    random.seed(42)
+    value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
+    input_values = [value] * 400
+    input_values[3] = "0x00000000"
+    driver.read.side_effect = input_values
+    assert script_runner.write_read_aging() == "[SCRIPT] FAIL"
