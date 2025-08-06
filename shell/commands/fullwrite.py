@@ -9,7 +9,7 @@ LBA_START = 0
 LBA_END = 100
 
 FULL_WRITE_DONE = "[Full Write] Done"
-INVALLID_COMMAND = "INVALID COMMAND"
+INVALID_COMMAND = "INVALID COMMAND"
 
 
 class FullWrite(Command):
@@ -20,12 +20,12 @@ class FullWrite(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            return INVALLID_COMMAND
+            return INVALID_COMMAND
 
         data = args[0]
 
         for LBA in range(LBA_START, LBA_END):
-            if self._write.execute([str(LBA), data]) == INVALLID_COMMAND:
-                return INVALLID_COMMAND
+            if self._write.execute([str(LBA), data]) == INVALID_COMMAND:
+                return INVALID_COMMAND
 
         return FULL_WRITE_DONE
