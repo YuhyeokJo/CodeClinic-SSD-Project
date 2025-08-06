@@ -3,8 +3,9 @@ from shell.command import Command
 from shell.commands.write import Write
 from shell.commands.read import Read
 
-INVALID =  "INVALID"
+INVALID = "INVALID"
 SCRIPT_INVALID_COMMAND = "[SCRIPT] INVALID COMMAND"
+
 
 class Script(Command):
     def __init__(self, driver):
@@ -15,7 +16,11 @@ class Script(Command):
         res = self.write_command.execute(args)
         if INVALID in res:
             return SCRIPT_INVALID_COMMAND
-        self._read_comapre(args)
+        return self._read_comapre(args)
 
-    def _read_comapre(self, args):
-        pass
+    def _read_comapre(self, args: list[str]) -> str:
+        res = self.read_command.execute([args[0]])
+        if res.split(" ")[-1] != args[1]:
+            return "[SCRIPT] FAIL"
+        return "[SCRIPT] PASS"
+
