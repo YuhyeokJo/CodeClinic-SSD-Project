@@ -3,6 +3,7 @@ from pytest_mock import MockerFixture
 
 from shell.commands.write import Write
 from shell.driver import SSDDriver
+from pathlib import Path
 
 
 def test_write_correctly(capsys, mocker: MockerFixture):
@@ -42,3 +43,9 @@ def test_write_wrongly_with_minus_lba(mocker: MockerFixture, wrong_argument):
 
         # assert
         assert actual == "INVALID COMMAND"
+
+
+def test_write_command():
+    ssd_driver = SSDDriver()
+    writeCommand = Write(ssd_driver)
+    assert f"[Write] Done" == writeCommand.execute(['42', "0x12345678"])

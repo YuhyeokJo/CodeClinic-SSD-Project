@@ -31,3 +31,9 @@ def test_full_write_command_fail_wrong_data(mocker: MockerFixture):
     full_write_command = FullWrite(driver)
 
     assert full_write_command.execute(['0xAABCDFFFFFFF']) == "INVALID COMMAND"
+
+def test_full_write_command(mocker: MockerFixture):
+    driver = SSDDriver()
+    full_write_command = FullWrite(driver)
+
+    assert full_write_command.execute(['0xABCDFFFF']) == "[Full Write] Done"
