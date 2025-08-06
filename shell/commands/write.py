@@ -34,4 +34,4 @@ class WriteCommand(Command):
         if not result:
             return "INVALID COMMAND"
         else:
-            return f"[WRITE] Done"
+            return f"[Write] Done"

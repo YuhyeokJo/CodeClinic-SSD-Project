@@ -18,7 +18,7 @@ def test_write_correctly(capsys, mocker: MockerFixture):
     actual = write_command.execute(["3", "0x00000001"])
 
     #assert
-    assert actual == "[WRITE] Done"
+    assert actual == "[Write] Done"
 
 @pytest.mark.parametrize(
     "wrong_argument", [
