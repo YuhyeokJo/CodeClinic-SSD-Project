@@ -159,8 +159,8 @@ def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance)
     pytest.fail()
 
 
-def test_lba_should_be_decimal(ssd):
 
+def test_lba_should_be_decimal(ssd_instance):
     """
     • [LBA] : 0 ~ 99, 10진수로 입력 받음
     """
