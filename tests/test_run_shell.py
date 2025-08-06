@@ -8,19 +8,19 @@ from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
-from shell.shell_test import TestShell
-from shell.shell_test import main
+from shell.run_shell import TestShell
+from shell.run_shell import main
 
 @pytest.fixture
 def mocked_driver_shell_input(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     test_shell = TestShell(driver)
-    input_patch = mocker.patch("shell.shell_test.input")
+    input_patch = mocker.patch("shell.run_shell.input")
 
     return driver, test_shell, input_patch
 
 def test_main_correct_input(capsys, mocker):
-    input_patch = mocker.patch("shell.shell_test.input")
+    input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect  = [
         "help",
         "exit",
@@ -39,7 +39,7 @@ def test_main_correct_input(capsys, mocker):
 
 
 def test_main_wrong_input(capsys, mocker):
-    input_patch = mocker.patch("shell.shell_test.input")
+    input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect  = [
         "not_exit",
         "exit"
