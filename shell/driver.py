@@ -5,8 +5,7 @@ from pathlib import Path
 class SSDDriver:
     def read(self, lba: str):
         subprocess.run(
-            "ssd R {}".format(lba),
-            cwd=r"../device",
+            "python ../device/ssd.py R {}".format(lba),
             shell=True
         )
 
@@ -19,8 +18,7 @@ class SSDDriver:
 
     def write(self, lba: str, data: str):
         subprocess.run(
-            "ssd W {} {}".format(lba, data),
-            cwd=r"../device",
+            "python ../device/ssd.py W {} {}".format(lba, data),
             shell=True
         )
 
