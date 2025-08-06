@@ -21,6 +21,21 @@ def test_write_correctly(capsys, mocker: MockerFixture):
     assert actual == "[Write] Done"
 
 
+def test_write_correctly_after_normalize_hex(capsys, mocker: MockerFixture):
+    """
+    올바르게 인수가 전달되었고 ssd가 동작하므로 [WRITE] Done을 반환해야 함
+    """
+    # arrange
+    mocked_ssd = mocker.Mock(spec=SSDDriver)
+    mocked_ssd.write.return_value = True
+    write_command = Write(mocked_ssd)
+
+    # assert
+    assert write_command.execute(["3", "0x000001"]) == "[Write] Done"
+    assert write_command.execute(["3", "0x00000FD"]) == "[Write] Done"
+
+
+
 @pytest.mark.parametrize(
     "wrong_argument", [
         ["-1", "0x00000001"],

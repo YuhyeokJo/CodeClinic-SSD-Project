@@ -34,7 +34,7 @@ class FullReadValidator(ArgumentValidator):
 
 class FullWriteValidator(ArgumentValidator):
     def validate(self, args: list[str]) -> bool:
-        return len(args) == 1 and is_valid_hex_data(args[0])
+        return len(args) == 1
 
 class HelpValidator(ArgumentValidator):
     def validate(self, args: list[str]) -> bool:

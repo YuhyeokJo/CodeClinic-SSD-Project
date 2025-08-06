@@ -8,15 +8,51 @@ from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
-from shell.test_shell import TestShell
+from shell.run_shell import TestShell
+from shell.run_shell import main
+
 
 @pytest.fixture
 def mocked_driver_shell_input(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     test_shell = TestShell(driver)
-    input_patch = mocker.patch("shell.test_shell.input")
+    input_patch = mocker.patch("shell.run_shell.input")
 
     return driver, test_shell, input_patch
+
+
+def test_main_correct_input(capsys, mocker):
+    input_patch = mocker.patch("shell.run_shell.input")
+    input_patch.side_effect = [
+        "help write",
+        "write 3 0x00000001",
+        "read 3",
+        "fullwrite 0x00000001",
+        "fullread",
+        "exit"
+    ]
+
+    main()
+
+    for output in capsys.readouterr().out.split("\n"):
+        if output == "INVALID COMMAND":
+            assert False
+
+
+def test_main_with_wrong_input_and_exit(capsys, mocker):
+    input_patch = mocker.patch("shell.run_shell.input")
+    input_patch.side_effect = [
+        "not_exit",
+        "exit"
+    ]
+
+    main()
+
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "INVALID COMMAND",
+        "[Exit]"
+    ]
+
 
 def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
@@ -30,17 +66,20 @@ def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     assert isinstance(test_shell._commands["exit"], Exit)
     assert isinstance(test_shell._commands["help"], Help)
 
-def test_not_exist_command(capsys, mocked_driver_shell_input):
+
+def test_not_exist_command_and_exit(capsys, mocked_driver_shell_input):
     # Arrange
     driver, test_shell, input_patch = mocked_driver_shell_input
-    input_patch.return_value = "not_exist"
+    input_patch.side_effect = ["not_exist", "exit"]
 
     # Act
     test_shell.run()
 
     # Assert
-    last_shell_line = capsys.readouterr().out.strip("\n")
-    assert last_shell_line == "INVALID COMMAND"
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "INVALID COMMAND", "[Exit]"
+    ]
+
 
 def test_read_command_input_with_correct_command(capsys, mocked_driver_shell_input):
     # Arrange

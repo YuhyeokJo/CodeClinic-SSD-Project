@@ -2,6 +2,7 @@ from shell.command import Command
 from shell.commands.fullread import FullRead
 from shell.commands.fullwrite import FullWrite
 from shell.commands.read import Read
+from shell.commands.script import Script1, Script2, Script3
 from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
@@ -21,6 +22,9 @@ class TestShell:
         self._commands["fullread"] = FullRead(self._driver)
         self._commands["exit"] = Exit(self._driver)
         self._commands["help"] = Help(self._driver)
+        self._commands["1_"] = self._commands["1_FullWriteAndReadCompare"] = Script1(self._driver)
+        self._commands["2_"] = self._commands["2_PartialLBAWrite"] = Script2(self._driver)
+        self._commands["3_"] = self._commands["3_WriteReadAging"] = Script3(self._driver)
 
     def run(self):
         while True:
@@ -34,9 +38,18 @@ class TestShell:
 
             if cmd not in self._commands:
                 print("INVALID COMMAND")
-                return
+                continue
 
             command = self._commands[cmd]
             print(self._commands[cmd].execute(args))
             if isinstance(command, Exit):
                 return
+
+
+def main():
+    shell = TestShell(SSDDriver())
+    shell.run()
+
+
+if __name__ == "__main__":
+    main()
