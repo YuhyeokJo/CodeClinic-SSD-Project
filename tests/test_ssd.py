@@ -24,8 +24,7 @@ def ssd():
 
 @pytest.fixture
 def mock_ssd(mocker):
-    mock_ssd_class_constructor = mocker.patch('device.ssd.SSD')
-    mock_ssd_instance = mock_ssd_class_constructor.return_value
+    mock_ssd_instance = mocker.patch('device.ssd.SSD').return_value
     mock_ssd_instance.write = mocker.Mock()
     mock_ssd_instance.read = mocker.Mock()
     return mock_ssd_instance

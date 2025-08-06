@@ -3,6 +3,8 @@ from device import Device
 import os
 import argparse
 
+INITIALIZED_DATA = "0x00000000"
+
 
 class SSD(Device):
     def __init__(self):
@@ -12,29 +14,29 @@ class SSD(Device):
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
 
     def write(self, address: int, value: int | str) -> None:
+        data = self._load_nand_data()
+        data[str(address)] = value if isinstance(value, str) else hex(value)
+        self._save_nand_data(data)
+
+    def read(self, address: int) -> None:
+        data = self._load_nand_data()
+        result = data.get(address, INITIALIZED_DATA)
+        with open(self.ssd_output_file, "w") as f:
+            f.write(f"{address} {result}\n")
+
+    def _load_nand_data(self) -> dict:
         data = {}
         if os.path.exists(self.ssd_nand_file):
             with open(self.ssd_nand_file, "r") as f:
                 for line in f:
                     addr, val = line.rstrip().split()
                     data[addr] = val
-        data[str(address)] = value if isinstance(value, str) else hex(value)
+        return data
 
+    def _save_nand_data(self, data: dict) -> None:
         with open(self.ssd_nand_file, "w") as f:
             for addr, val in sorted(data.items()):
                 f.write(f"{addr} {val}\n")
-
-    def read(self, address: int) -> None:
-        data = {}
-        if os.path.exists(self.ssd_nand_file):
-            with open(self.ssd_nand_file, "r") as f:
-                for line in f:
-                    addr, val = line.rstrip().split()
-                    data[str(addr)] = val
-
-        result = data.get(address, "0x00000000")
-        with open(self.ssd_output_file, "w") as f:
-            f.write(f"{address} {result}\n")
 
 
 def main():
