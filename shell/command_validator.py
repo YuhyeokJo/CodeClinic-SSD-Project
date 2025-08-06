@@ -21,3 +21,9 @@ class ReadValidator(ArgumentValidator):
     def validate(self, args: list[str]) -> bool:
         return len(args) == 1 and is_valid_lba(args[0])
 
+class WriteValidator(ArgumentValidator):
+    def validate(self, args: list[str]) -> bool:
+        if len(args) != 2:
+            return False
+        lba, data = args
+        return is_valid_lba(lba) and is_valid_hex_data(data)
