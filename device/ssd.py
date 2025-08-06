@@ -48,7 +48,7 @@ class SSD(Device):
 
     def _save_nand_data(self, data: dict) -> None:
         with open(self.ssd_nand_file, "w") as f:
-            for lba, val in sorted(data.items()):
+            for lba, val in data.items():
                 f.write(f"{lba} {val}\n")
 
 

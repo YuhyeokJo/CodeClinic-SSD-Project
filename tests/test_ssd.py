@@ -131,6 +131,19 @@ def test_write_when_ssd_nand_text_exists(ssd_instance):
     assert line1 + line2 == f"{cmd1.lba} {cmd1.value}\n{cmd2.lba} {cmd2.value}\n"
 
 
+def test_write_when_ssd_nand_text_exists_multiple(ssd_instance):
+    expected = ""
+    for lba in range(100):
+        value = f"0x{lba:0{8}x}"
+        expected += f"{lba} {value}\n"
+        ssd_instance.write(str(lba), value)
+
+    with open(ssd_instance.ssd_nand_file, "r") as f:
+        result = f.read()
+
+    assert expected == result
+
+
 def test_write_when_same_lba(ssd_instance):
     # act
     cmd1 = WriteCommand(cmd="W", lba='2', value='0xAAAABBBB')
