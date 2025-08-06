@@ -24,6 +24,8 @@ class ScriptRunner:
                 res = self.write_command.execute([lba, inputs[lba]])
                 if INVALID_COMMAND in res:
                     return INVALID_COMMAND
+        for group in groups:
+            for lba in group:
                 results.append(self._read_compare([lba, inputs[lba]]))
         if not all(results):
             return SCRIPT_FAIL
