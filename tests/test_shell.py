@@ -19,29 +19,33 @@ def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     assert isinstance(test_shell._commands["fullwrite"], FullWrite)
     assert isinstance(test_shell._commands["fullread"], FullRead)
 
-def test_read_command_input(capsys, mocker: MockerFixture):
+def test_read_command_input_with_correct_command(capsys, mocker: MockerFixture):
+    # Arrange
     driver = mocker.Mock(spec=SSDDriver)
     test_shell = TestShell(driver)
-
     input_patch = mocker.patch("shell.test_shell.input")
     driver.read.return_value = "0x00000001"
     input_patch.return_value = "read 3"
 
-    expected = "[Read] LBA 3: 0x00000001"
+    # Act
     test_shell.run()
-    actual = capsys.readouterr().out.strip("\n")
-    assert actual == expected
+
+    # Assert
+    last_shell_line = capsys.readouterr().out.strip("\n")
+    assert last_shell_line == "[Read] LBA 3: 0x00000001"
 
 
 def test_read_command_input_with_wrong_lba(capsys, mocker: MockerFixture):
+    # Arrange
     driver = mocker.Mock(spec=SSDDriver)
     test_shell = TestShell(driver)
-
     input_patch = mocker.patch("shell.test_shell.input")
     driver.read.return_value = "0x00000001"
     input_patch.return_value = "read -1"
 
-    expected = "[Read] INVALID COMMAND"
+    # Act
     test_shell.run()
-    actual = capsys.readouterr().out.strip("\n").split("\n")[-1]
-    assert actual == expected
+
+    # Assert
+    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-1]
+    assert last_shell_line == "[Read] INVALID COMMAND"
