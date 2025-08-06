@@ -5,7 +5,6 @@ from shell.driver import SSDDriver
 class Help(Command):
     def __init__(self, driver: SSDDriver):
         self._driver = driver
-        self._developer = "Code Clinic 조유혁 (팀장님✨) "
         self._help_map = {
             "read": "read <LBA> <Value> (Reads value from given LBA)",
             "write": "write <LBA> (Writes value to LBA)",
@@ -18,7 +17,7 @@ class Help(Command):
         return f"""
                 SSD Test Shell Tool
                 Team: ✨Code Clinic✨
-                Author: 조유혁(팀장님), 강동혁, 김혜원, 배정은, 조보근
+                Author: 조유혁(팀장님), 강동협, 김혜원, 배정은, 조보근
                 Command: {cmd.lower()}
                 Usage & Description: {usage}
                 """
