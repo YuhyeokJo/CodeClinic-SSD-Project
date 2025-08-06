@@ -5,7 +5,8 @@ from shell.commands.read import Read
 
 INVALID = "INVALID"
 SCRIPT_INVALID_COMMAND = "[SCRIPT] INVALID COMMAND"
-
+SCRIPT_PASS = "[SCRIPT] PASS"
+SCRIPT_FAIL = "[SCRIPT] FAIL"
 
 class Script(Command):
     def __init__(self, driver):
@@ -19,8 +20,9 @@ class Script(Command):
         return self._read_comapre(args)
 
     def _read_comapre(self, args: list[str]) -> str:
-        res = self.read_command.execute([args[0]])
-        if res.split(" ")[-1] != args[1]:
-            return "[SCRIPT] FAIL"
-        return "[SCRIPT] PASS"
+        lba, data = args[0], args[1]
+        res = self.read_command.execute([lba])
+        if res.split(" ")[-1] != data:
+            return SCRIPT_FAIL
+        return SCRIPT_PASS
 
