@@ -142,14 +142,21 @@ def test_read_creates_ssd_output_text_and_read_value(ssd_instance):
 
 def test_read_origin_ssd_output_should_be_gone(ssd_instance):
     """
-     ssd_output.txt 에 읽은 값이 적힌다. (기존 데이터는 사라진다.)
+    ssd_output.txt 에 읽은 값이 적힌다. (기존 데이터는 사라진다.)
     """
-    pytest.fail()
+    ssd_instance.write(2, "0xAAAABBBB")
+    ssd_instance.read(2)
+    ssd_instance.read(3)
+
+    with open(ssd_instance.ssd_output_file, "r") as f:
+        actual = f.read()
+
+    assert actual != "0xAAAABBBB"
 
 
 def test_read_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance):
     """
-     • 잘못된LBA 범위가 입력되면ssd_output.txt에 "ERROR"가 기록된다.
+    잘못된 LBA 범위가 입력되면ssd_output.txt에 "ERROR"가 기록된다.
     """
     ssd_instance.read(-1)
     with open(ssd_instance.ssd_output_file, "r") as f:
