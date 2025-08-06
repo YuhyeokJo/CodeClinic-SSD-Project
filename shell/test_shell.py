@@ -19,7 +19,7 @@ class TestShell:
         self._commands["fullread"] = FullRead(self._driver)
 
     def run(self):
-        for _ in range(1):
+        while True:
             line = input("Shell> ").strip()
             if not line:
                 return
@@ -27,5 +27,7 @@ class TestShell:
             cmd = parts[0]
             args = parts[1:]
 
-            if cmd in self._commands:
+            if cmd == "exit":
+                return
+            elif cmd in self._commands:
                 print(self._commands[cmd].execute(args))
