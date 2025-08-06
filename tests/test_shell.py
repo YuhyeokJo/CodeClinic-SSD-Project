@@ -68,14 +68,15 @@ def test_if_builtin_commands_are_registered(mocker: MockerFixture):
 def test_not_exist_command(capsys, mocked_driver_shell_input):
     # Arrange
     driver, test_shell, input_patch = mocked_driver_shell_input
-    input_patch.return_value = "not_exist"
+    input_patch.side_effect = ["not_exist", "exit"]
 
     # Act
     test_shell.run()
 
     # Assert
-    last_shell_line = capsys.readouterr().out.strip("\n")
-    assert last_shell_line == "INVALID COMMAND"
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "INVALID COMMAND", "[Exit]"
+    ]
 
 def test_read_command_input_with_correct_command(capsys, mocked_driver_shell_input):
     # Arrange
