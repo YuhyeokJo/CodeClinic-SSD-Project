@@ -5,13 +5,23 @@ from shell.driver import SSDDriver
 class Help(Command):
     def __init__(self, driver: SSDDriver):
         self._driver = driver
+        self._developer = "Code Clinic 조유혁 (팀장님✨) "
         self._help_map = {
-            "READ": "read <LBA> <Value>: Reads value from given LBA",
-            "WRITE": "write <LBA>: Writes value to LBA",
-            "FULLREAD": "fullread: Reads value from all LBA(0~99)",
-            "FULLWRITE": "fullwrite <Value>:  Writes value to all LBA(0~99)",
-            "EXIT": "exit: Exit shell"
+            "read": "read <LBA> <Value> (Reads value from given LBA)",
+            "write": "write <LBA> (Writes value to LBA)",
+            "fullread": "fullread: (Reads value from all LBA(0~99))",
+            "fullwrite": "fullwrite <Value> (Writes value to all LBA(0~99))",
+            "exit": "exit (Exit shell)"
         }
+
+    def format_help(self, cmd: str, usage: str) -> str:
+        return f"""
+                SSD Test Shell Tool
+                Team: ✨Code Clinic✨
+                Author: 조유혁(팀장님), 강동혁, 김혜원, 배정은, 조보근
+                Command: {cmd.lower()}
+                Usage & Description: {usage}
+                """
 
     def execute(self, args: list[str]) -> str:
         if not args:
@@ -19,7 +29,7 @@ class Help(Command):
             return f"Available commands:\n{available}"
 
         cmd = args[0]
-        cmd_upper = cmd.upper()
-        if cmd_upper in self._help_map:
-            return self._help_map[cmd_upper]
+        cmd_lower = cmd.lower()
+        if cmd_lower in self._help_map:
+            return self.format_help(cmd_lower, self._help_map[cmd_lower])
         return f"Unknown command: {cmd}"
