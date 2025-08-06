@@ -12,7 +12,7 @@ from device.ssd import SSD
 @dataclass
 class WriteCommand:
     cmd: str
-    address: int
+    lba: int
     value: int | str
 
 
@@ -64,46 +64,46 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd_instance):
     ssd_nand.txt 파일이 없는 경우, 생성 후 데이터가 기록되어야 한다.
     """
     # arrange
-    cmd = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
+    cmd = WriteCommand(cmd="W", lba=2, value=0xAAAABBBB)
 
     # act
-    ssd_instance.write(cmd.address, cmd.value)
+    ssd_instance.write(cmd.lba, cmd.value)
 
     with open(ssd_instance.ssd_nand_file, "r") as f:
         lines = f.readlines()[0]
 
     # assert
-    assert lines == f"{cmd.address} {hex(cmd.value)}\n"
+    assert lines == f"{cmd.lba} {hex(cmd.value)}\n"
 
 
 def test_write_when_ssd_nand_text_exists(ssd_instance):
     # act
-    cmd1 = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
-    ssd_instance.write(cmd1.address, cmd1.value)
+    cmd1 = WriteCommand(cmd="W", lba=2, value=0xAAAABBBB)
+    ssd_instance.write(cmd1.lba, cmd1.value)
 
-    cmd2 = WriteCommand(cmd="W", address=3, value=0xAAAABBBB)
-    ssd_instance.write(cmd2.address, cmd2.value)
+    cmd2 = WriteCommand(cmd="W", lba=3, value=0xAAAABBBB)
+    ssd_instance.write(cmd2.lba, cmd2.value)
 
     with open(ssd_instance.ssd_nand_file, "r") as f:
         line1, line2 = f.readlines()
 
     # assert
-    assert line1 + line2 == f"{cmd1.address} {hex(cmd1.value)}\n{cmd2.address} {hex(cmd2.value)}\n"
+    assert line1 + line2 == f"{cmd1.lba} {hex(cmd1.value)}\n{cmd2.lba} {hex(cmd2.value)}\n"
 
 
-def test_write_when_same_address(ssd_instance):
+def test_write_when_same_lba(ssd_instance):
     # act
-    cmd1 = WriteCommand(cmd="W", address=2, value=0xAAAABBBB)
-    ssd_instance.write(cmd1.address, cmd1.value)
+    cmd1 = WriteCommand(cmd="W", lba=2, value=0xAAAABBBB)
+    ssd_instance.write(cmd1.lba, cmd1.value)
 
-    cmd2 = WriteCommand(cmd="W", address=2, value=0xFFFFFFFF)
-    ssd_instance.write(cmd2.address, cmd2.value)
+    cmd2 = WriteCommand(cmd="W", lba=2, value=0xFFFFFFFF)
+    ssd_instance.write(cmd2.lba, cmd2.value)
 
     data = dict()
     with open(ssd_instance.ssd_nand_file, "r") as f:
         for line in f:
-            address, val = line.rstrip().split(' ')
-            data[str(address)] = val
+            lba, val = line.rstrip().split(' ')
+            data[str(lba)] = val
 
     # assert
     assert data['2'] == '0xffffffff'
@@ -117,8 +117,8 @@ def test_read_init_value_should_be_0x00000000(ssd_instance):
     data = {}
     with open(ssd_instance.ssd_output_file, "r") as f:
         for line in f:
-            address, val = line.rstrip().split(' ')
-            data[address] = val
+            lba, val = line.rstrip().split(' ')
+            data[lba] = val
 
     assert data["0"] == "0x00000000"
 
@@ -134,8 +134,8 @@ def test_read_creates_ssd_output_text_and_read_value(ssd_instance):
     data = {}
     with open(ssd_instance.ssd_output_file, "r") as f:
         for line in f:
-            address, val = line.rstrip().split(' ')
-            data[address] = val
+            lba, val = line.rstrip().split(' ')
+            data[lba] = val
 
     assert data["2"] == "0xAAAABBBB"
 
