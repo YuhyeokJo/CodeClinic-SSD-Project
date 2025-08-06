@@ -9,6 +9,7 @@ from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
 from shell.shell_test import TestShell
+from shell.shell_test import main
 
 @pytest.fixture
 def mocked_driver_shell_input(mocker: MockerFixture):
@@ -17,6 +18,40 @@ def mocked_driver_shell_input(mocker: MockerFixture):
     input_patch = mocker.patch("shell.shell_test.input")
 
     return driver, test_shell, input_patch
+
+def test_main_correct_input(capsys, mocker):
+    input_patch = mocker.patch("shell.shell_test.input")
+    input_patch.side_effect  = [
+        "help",
+        "exit",
+        "write 3 0x00000001",
+        "read 3",
+        "fullwrite",
+        "fullread",
+        "exit"
+    ]
+
+    main()
+
+    for output in capsys.readouterr().out.split("\n"):
+        if output == "INVALID COMMAND":
+            assert False
+
+
+def test_main_wrong_input(capsys, mocker):
+    input_patch = mocker.patch("shell.shell_test.input")
+    input_patch.side_effect  = [
+        "not_exit",
+        "exit"
+    ]
+
+    main()
+
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "INVALID COMMAND",
+        "[Exit]"
+    ]
+
 
 def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
