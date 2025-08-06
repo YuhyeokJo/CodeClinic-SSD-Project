@@ -17,5 +17,5 @@ class FullRead(Command):
         result = ""
         for lba in range(100):
             data = self.driver.read(str(lba))
-            result += f"\n [Read] LBA {lba} : {data}"
+            result += f"\n [Read] LBA {lba}: {data}"
         return result

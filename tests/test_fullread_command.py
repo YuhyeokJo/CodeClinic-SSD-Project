@@ -28,5 +28,5 @@ def test_fullread_command(mocker: MockerFixture):
     full_reader = FullRead(driver)
     result = ""
     for lba in range(100):
-        result += f"\n [Read] LBA {lba} : 0xABCDFFFF"
+        result += f"\n [Read] LBA {lba}: 0xABCDFFFF"
     assert full_reader.execute([]) == result
