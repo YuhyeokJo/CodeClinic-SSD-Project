@@ -1,10 +1,8 @@
 import sys
-
 import pytest
 import shutil
 
 from dataclasses import dataclass
-
 from pytest_mock import MockerFixture
 
 from device import ssd
@@ -28,7 +26,7 @@ def ssd_instance():
 def test_main_write_command(ssd_instance, mocker: MockerFixture):
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
-    sys.argv = ['ssd.py', 'W', '10', '0xAAAABBBB' ]
+    sys.argv = ['ssd.py', 'W', '10', '0xAAAABBBB']
     ssd.main()
 
     mock_ssd.write.assert_called_once_with(10, '0xAAAABBBB')
@@ -45,59 +43,58 @@ def test_main_read_command(ssd_instance, mocker: MockerFixture):
     mock_ssd.write.assert_not_called()
 
 
-def test_main_other_command(ssd_instance, mocker: MockerFixture):
+@pytest.mark.parametrize("invalid_lba", [
+    'K',
+    'a'
+])
+def test_main_other_command(ssd_instance, mocker: MockerFixture, invalid_lba, capsys):
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
-    sys.argv = ['ssd.py', 'K', '10']
+    sys.argv = ['ssd.py', invalid_lba, '10']
     with pytest.raises(SystemExit):
         ssd.main()
 
+    capsys.readouterr()
     mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
 
 
-def test_lba_should_be_decimal(ssd_instance, mocker: MockerFixture):
+@pytest.mark.parametrize("invalid_lba", [
+    'error',
+    "0xB"
+])
+def test_lba_should_be_decimal(ssd_instance, mocker: MockerFixture, invalid_lba, capsys):
     """
     [LBA] : 10진수로 입력 받음
     """
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
 
-    sys.argv = ['ssd.py', 'W', 'error', "0xAAAABBBB"]
+    sys.argv = ['ssd.py', 'W', invalid_lba, "0xAAAABBBB"]
     with pytest.raises(SystemExit):
         ssd.main()
 
-    sys.argv = ['ssd.py', 'W', '0xB', "0xAAAABBBBB"]
-    with pytest.raises(SystemExit):
-        ssd.main()
-
+    capsys.readouterr()
     mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
 
 
-def test_value_always_startswith_0x_and_length_10(ssd_instance, mocker: MockerFixture):
+@pytest.mark.parametrize("invalid_value", [
+    "AA",
+    "0xa",
+    "0xAAAABBBBBB",
+])
+def test_value_always_startswith_0x_and_length_10(ssd_instance, mocker: MockerFixture, invalid_value, capsys):
     """
     [Value] : 항상 0x가 붙으며 10 글자로 표기한다. ( 0x00000000  ~  0xFFFFFFFF)
     """
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
 
-    sys.argv = ['ssd.py', 'W', '2', "AA"]
+    sys.argv = ['ssd.py', 'W', '2', invalid_value]
     with pytest.raises(SystemExit):
         ssd.main()
-
-    sys.argv = ['ssd.py', 'W', '2', '0xa']
-    with pytest.raises(SystemExit):
-        ssd.main()
-
-    sys.argv = ['ssd.py', 'W', '2', '0xA']
-    with pytest.raises(SystemExit):
-        ssd.main()
-
-    sys.argv = ['ssd.py', 'W', '2', '0xAAAABBBBBB']
-    with pytest.raises(SystemExit):
-        ssd.main()
-
+    capsys.readouterr()
     mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
 
