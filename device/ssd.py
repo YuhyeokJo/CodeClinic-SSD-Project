@@ -11,20 +11,20 @@ class SSD(Device):
         self.ssd_nand_file = self.output_dir / "ssd_nand.txt"
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
 
-    def write(self, address: int | str, value: int | str):
+    def write(self, address: int, value: int | str) -> None:
         data = {}
         if os.path.exists(self.ssd_nand_file):
             with open(self.ssd_nand_file, "r") as f:
                 for line in f:
                     addr, val = line.rstrip().split()
-                    data[str(addr)] = val
+                    data[addr] = val
         data[str(address)] = value if isinstance(value, str) else hex(value)
 
         with open(self.ssd_nand_file, "w") as f:
             for addr, val in sorted(data.items()):
                 f.write(f"{addr} {val}\n")
 
-    def read(self, address):
+    def read(self, address: int) -> None:
         data = {}
         if os.path.exists(self.ssd_nand_file):
             with open(self.ssd_nand_file, "r") as f:
@@ -55,9 +55,9 @@ def main():
 
     ssd = SSD()
     if args.command == "W":
-        ssd.write(str(args.lba), args.value)
+        ssd.write(args.lba, args.value)
     elif args.command == "R":
-        ssd.read(str(args.lba))
+        ssd.read(args.lba)
 
 
 if __name__ == "__main__":
