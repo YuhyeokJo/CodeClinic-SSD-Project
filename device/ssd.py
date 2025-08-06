@@ -2,6 +2,7 @@ from pathlib import Path
 from device import Device
 import os
 import argparse
+import re
 
 INITIALIZED_DATA = "0x00000000"
 
@@ -13,22 +14,22 @@ class SSD(Device):
         self.ssd_nand_file = self.output_dir / "ssd_nand.txt"
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
 
-    def write(self, lba: int, value: int | str) -> None:
-        if lba < 0 or 99 < lba:
+    def write(self, lba: str, value: str) -> None:
+        if int(lba) < 0 or 99 < int(lba):
             self._write_output("ERROR")
             return
 
         data = self._load_nand_data()
-        data[str(lba)] = value if isinstance(value, str) else hex(value)
+        data[lba] = value
         self._save_nand_data(data)
 
-    def read(self, lba: int) -> None:
-        if lba < 0 or 99 < lba:
+    def read(self, lba: str) -> None:
+        if int(lba) < 0 or 99 < int(lba):
             self._write_output("ERROR")
             return
 
         data = self._load_nand_data()
-        result = data.get(str(lba), INITIALIZED_DATA)
+        result = data.get(lba, INITIALIZED_DATA)
         with open(self.ssd_output_file, "w") as f:
             f.write(f"{lba} {result}\n")
 
@@ -42,7 +43,7 @@ class SSD(Device):
             with open(self.ssd_nand_file, "r") as f:
                 for line in f:
                     lba, val = line.rstrip().split()
-                    data[str(lba)] = val
+                    data[lba] = val
         return data
 
     def _save_nand_data(self, data: dict) -> None:
