@@ -30,7 +30,7 @@ class SSD(Device):
             return
 
         data = self._load_nand_data()
-        result = data.get(lba, INITIALIZED_DATA)
+        result = data.get(str(lba), INITIALIZED_DATA)
         with open(self.ssd_output_file, "w") as f:
             f.write(f"{lba} {result}\n")
 
