@@ -33,12 +33,12 @@ def test_execute_with_valid_arg(mocker, capsys):
     ssd_driver.read.return_value = "0x12345678"
     assert "[Read] LBA 42: 0x12345678" == readCommand.execute(['42'])
 
+
 def test_read_command():
     output_dir = Path(__file__).resolve().parent.parent / "output"
     ssd_nand_file = output_dir / "ssd_nand.txt"
     with open(ssd_nand_file, "w") as f:
         f.write("42 0x12345678")
-
 
     ssd_driver = SSDDriver()
     readCommand = Read(ssd_driver)
