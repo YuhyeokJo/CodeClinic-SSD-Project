@@ -1,0 +1,42 @@
+from shell.command import Command
+from shell.commands.fullread import FullRead
+from shell.commands.fullwrite import FullWrite
+from shell.commands.read import Read
+from shell.commands.write import Write
+from shell.commands.help import Help
+from shell.commands.exit import Exit
+from shell.driver import SSDDriver
+
+
+class TestShell:
+    def __init__(self, driver: SSDDriver):
+        self._driver = driver
+        self._commands: dict[str, Command] = {}
+        self._register_builtin_commands()
+
+    def _register_builtin_commands(self):
+        self._commands["write"] = Write(self._driver)
+        self._commands["read"] = Read(self._driver)
+        self._commands["fullwrite"] = FullWrite(self._driver)
+        self._commands["fullread"] = FullRead(self._driver)
+        self._commands["exit"] = Exit(self._driver)
+        self._commands["help"] = Help(self._driver)
+
+    def run(self):
+        while True:
+            line = input("Shell> ").strip()
+            if not line:
+                print("INVALID COMMAND")
+                continue
+            parts = line.split()
+            cmd = parts[0]
+            args = parts[1:]
+
+            if cmd not in self._commands:
+                print("INVALID COMMAND")
+                return
+
+            command = self._commands[cmd]
+            print(self._commands[cmd].execute(args))
+            if isinstance(command, Exit):
+                return
