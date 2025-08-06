@@ -38,7 +38,7 @@ def test_main_correct_input(capsys, mocker):
             assert False
 
 
-def test_main_wrong_input(capsys, mocker):
+def test_main_with_wrong_input_and_exit(capsys, mocker):
     input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect  = [
         "not_exit",
@@ -65,7 +65,7 @@ def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     assert isinstance(test_shell._commands["exit"], Exit)
     assert isinstance(test_shell._commands["help"], Help)
 
-def test_not_exist_command(capsys, mocked_driver_shell_input):
+def test_not_exist_command_and_exit(capsys, mocked_driver_shell_input):
     # Arrange
     driver, test_shell, input_patch = mocked_driver_shell_input
     input_patch.side_effect = ["not_exist", "exit"]
