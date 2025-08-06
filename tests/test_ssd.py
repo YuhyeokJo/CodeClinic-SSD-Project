@@ -3,6 +3,8 @@ import shutil
 
 from dataclasses import dataclass
 
+from pytest_mock import MockerFixture
+
 from device.ssd import SSD
 
 
@@ -19,6 +21,50 @@ def ssd():
     shutil.rmtree(ssd_instance.output_dir, ignore_errors=True)
     return SSD()
 
+
+def test_main_write_command(ssd, mocker:MockerFixture):
+    mock_args = mocker.Mock(command='W', lba=10, value='0xABCDEF01')
+    mocker.patch('argparse.ArgumentParser.parse_args', return_value=mock_args)
+    mock_ssd_class_constructor = mocker.patch('device.ssd.SSD')
+    mock_ssd_instance = mock_ssd_class_constructor.return_value
+    mock_ssd_instance.write = mocker.Mock()
+    mock_ssd_instance.read = mocker.Mock()
+
+    from device import ssd
+    ssd.main()
+
+    mock_ssd_class_constructor.assert_called_once()
+    mock_ssd_instance.write.assert_called_once_with(10, '0xABCDEF01')
+    mock_ssd_instance.read.assert_not_called()
+
+def test_main_read_command(ssd, mocker:MockerFixture):
+    mock_args = mocker.Mock(command='R', lba=10)
+    mocker.patch('argparse.ArgumentParser.parse_args', return_value=mock_args)
+    mock_ssd_class_constructor = mocker.patch('device.ssd.SSD')
+    mock_ssd_instance = mock_ssd_class_constructor.return_value
+    mock_ssd_instance.write = mocker.Mock()
+    mock_ssd_instance.read = mocker.Mock()
+
+    from device import ssd
+    ssd.main()
+
+    mock_ssd_class_constructor.assert_called_once()
+    mock_ssd_instance.read.assert_called_once_with(10)
+    mock_ssd_instance.write.assert_not_called()
+
+def test_main_other_command(ssd, mocker:MockerFixture):
+    mock_args = mocker.Mock(command='K', lba=10)
+    mocker.patch('argparse.ArgumentParser.parse_args', return_value=mock_args)
+    mock_ssd_class_constructor = mocker.patch('device.ssd.SSD')
+    mock_ssd_instance = mock_ssd_class_constructor.return_value
+    mock_ssd_instance.write = mocker.Mock()
+    mock_ssd_instance.read = mocker.Mock()
+
+    from device import ssd
+    ssd.main()
+
+    mock_ssd_instance.read.assert_not_called()
+    mock_ssd_instance.write.assert_not_called()
 
 def test_write_when_no_ssd_nand_text_create_then_write(ssd):
     """
