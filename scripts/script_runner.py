@@ -24,7 +24,6 @@ class ScriptRunner:
                 if INVALID in res:
                     return SCRIPT_INVALID_COMMAND
                 results.append(self._read_compare([lba, inputs[lba]]))
-        print(results)
         if not all(results):
             return SCRIPT_FAIL
         return SCRIPT_PASS
@@ -39,16 +38,27 @@ class ScriptRunner:
             inputs[key] = value
         return inputs
 
-    def scenario2(self) -> str:
-        pass
+    def partial_lba_write(self) -> str:
+        value = "0x11112345"
+        lbas = ["4", "0", "3", "1", "2"]
+        results = []
+        for _ in range(30):
+            for lba in lbas:
+                res = self.write_command.execute([lba, value])
+                if INVALID in res:
+                    return SCRIPT_INVALID_COMMAND
+            for lba in lbas:
+                results.append(self._read_compare([lba, value]))
+        if not all(results):
+            return SCRIPT_FAIL
+        return SCRIPT_PASS
 
-    def scenario3(self) -> str:
+    def write_read_aging(self) -> str:
         pass
 
     def _read_compare(self, args: list[str]) -> bool:
         lba, data = args[0], args[1]
         res = self.read_command.execute([lba])
-        print(res)
         if res.split(" ")[-1] != data:
             return False
         return True

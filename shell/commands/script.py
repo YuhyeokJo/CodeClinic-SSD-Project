@@ -16,7 +16,7 @@ class Script2(Command):
         self.script_runner = ScriptRunner(driver)
 
     def execute(self, args: list[str] = None) -> str:
-        return self.script_runner.scenario2()
+        return self.script_runner.partial_lba_write()
 
 
 class Script3(Command):
@@ -24,4 +24,4 @@ class Script3(Command):
         self.script_runner = ScriptRunner(driver)
 
     def execute(self, args: list[str] = None) -> str:
-        return self.script_runner.scenario3()
+        return self.script_runner.write_read_aging()
