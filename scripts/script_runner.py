@@ -10,6 +10,7 @@ SCRIPT_FAIL = "[SCRIPT] FAIL"
 
 class ScriptRunner:
     def __init__(self, driver: SSDDriver):
+        self.seeds = list(range(200))
         self.write_command = Write(driver)
         self.read_command = Read(driver)
 
@@ -54,9 +55,11 @@ class ScriptRunner:
         return SCRIPT_PASS
 
     def write_read_aging(self) -> str:
-        random.seed(42)
-        value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
-        for _ in range(200):
+        values = []
+        for num_seed in self.seeds:
+            random.seed(num_seed)
+            value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
+            values.append(value)
             res = self.write_command.execute(["0", value])
             if INVALID_COMMAND in res:
                 return INVALID_COMMAND
@@ -64,7 +67,7 @@ class ScriptRunner:
             if INVALID_COMMAND in res:
                 return INVALID_COMMAND
         results = []
-        for _ in range(200):
+        for value in values:
             results.append(self._read_compare(["0", value]))
             results.append(self._read_compare(["99", value]))
         if not all(results):

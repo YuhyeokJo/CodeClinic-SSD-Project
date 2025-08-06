@@ -75,18 +75,20 @@ def test_write_read_aging_count(mocker: MockerFixture):
 def test_write_read_aging_pass(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)
-    random.seed(42)
-    value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
-    driver.read.side_effect = [value] * SCRIPT_3_LBA_SIZE * SCRIPT_3_LOOP_SIZE
+    input_values = []
+    for num_seed in script_runner.seeds:
+        random.seed(num_seed)
+        input_values.append(f"0x{random.randint(0, 0xFFFFFFFF):08X}")
+    driver.read.side_effect = [item for item in input_values for _ in range(SCRIPT_3_LBA_SIZE)]
     assert script_runner.write_read_aging() == "[SCRIPT] PASS"
 
 
 def test_write_read_aging_fail(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)
-    random.seed(42)
-    value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
-    input_values = [value] * SCRIPT_3_LBA_SIZE * SCRIPT_3_LOOP_SIZE
-    input_values[3] = "0x00000000"
-    driver.read.side_effect = input_values
+    input_values = []
+    for num_seed in script_runner.seeds:
+        random.seed(num_seed)
+        input_values.append(f"0x{random.randint(0, 0xFFFFFFFF):08X}")
+    driver.read.side_effect = input_values * SCRIPT_3_LBA_SIZE
     assert script_runner.write_read_aging() == "[SCRIPT] FAIL"
