@@ -1,13 +1,14 @@
 from shell.commands.read import Read
 from shell.driver import SSDDriver
 
-INVALID_COMMAND = "[Read] INVALID COMMAND"
+INVALID_COMMAND = "INVALID COMMAND"
+
 
 def test_execute_with_no_args(mocker):
     ssd_driver = mocker.Mock(spec=SSDDriver)
 
-    readCommand = Read(ssd_driver)
-    assert INVALID_COMMAND == readCommand.execute([])
+    read_command = Read(ssd_driver)
+    assert INVALID_COMMAND == read_command.execute([])
 
 
 def test_execute_with_too_many_args(mocker):

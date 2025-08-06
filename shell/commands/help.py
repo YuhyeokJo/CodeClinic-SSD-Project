@@ -1,15 +1,18 @@
 from shell.command import Command
+from shell.command_validator import HelpValidator
 from shell.driver import SSDDriver
 
 
 class Help(Command):
     def __init__(self, driver: SSDDriver):
         self._driver = driver
+        self._validator = HelpValidator()
         self._help_map = {
             "read": "read <LBA> <Value> (Reads value from given LBA)",
             "write": "write <LBA> (Writes value to LBA)",
             "fullread": "fullread: (Reads value from all LBA(0~99))",
             "fullwrite": "fullwrite <Value> (Writes value to all LBA(0~99))",
+            "help": "help (Print Usage)",
             "exit": "exit (Exit shell)"
         }
 
@@ -23,12 +26,8 @@ class Help(Command):
                 """
 
     def execute(self, args: list[str]) -> str:
-        if not args:
-            available = "\n".join(f"- {cmd}" for cmd in self._help_map)
-            return f"Available commands:\n{available}"
+        if not self._validator.validate(args):
+            return "INVALID COMMAND"
 
-        cmd = args[0]
-        cmd_lower = cmd.lower()
-        if cmd_lower in self._help_map:
-            return self.format_help(cmd_lower, self._help_map[cmd_lower])
-        return f"Unknown command: {cmd}"
+        cmd = args[0].lower()
+        return self.format_help(cmd, self._help_map[cmd])

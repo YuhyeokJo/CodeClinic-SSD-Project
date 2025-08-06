@@ -67,7 +67,7 @@ def test_read_command_input_with_wrong_lba(capsys, mocked_driver_shell_input):
 
     # Assert
     last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-2]
-    assert last_shell_line == "[Read] INVALID COMMAND"
+    assert last_shell_line == "INVALID COMMAND"
 
 
 def test_read_command_correctly_until_exit(capsys, mocked_driver_shell_input):

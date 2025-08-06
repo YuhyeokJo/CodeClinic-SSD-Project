@@ -16,12 +16,14 @@ def test_full_write_command_success(mocker: MockerFixture):
     called_lbas = [call.args[0] for call in driver.write.call_args_list]
     assert called_lbas == [str(x) for x in range(100)]
 
+
 def test_full_write_command_fail_empty_data(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     driver.write.return_value = False
     full_write_command = FullWrite(driver)
 
     assert full_write_command.execute([]) == "INVALID COMMAND"
+
 
 def test_full_write_command_fail_wrong_data(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)

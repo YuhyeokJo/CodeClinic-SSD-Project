@@ -8,7 +8,7 @@ def test_fullread_count(mocker: MockerFixture):
     expected_output = [f"0x{lba:08X}" for lba in range(100)]
     driver.read.side_effect = expected_output
     full_reader = FullRead(driver)
-    full_reader.execute()
+    full_reader.execute([])
     assert driver.read.call_count == 100
 
 
@@ -20,4 +20,4 @@ def test_fullread_result(mocker: MockerFixture):
     result = ""
     for lba, value in enumerate(expected_output):
         result += f"\n [Read] LBA {lba} : {value}"
-    assert full_reader.execute() == result
+    assert full_reader.execute([]) == result
