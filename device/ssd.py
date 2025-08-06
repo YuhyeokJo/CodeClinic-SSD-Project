@@ -42,7 +42,7 @@ class SSD(Device):
             with open(self.ssd_nand_file, "r") as f:
                 for line in f:
                     lba, val = line.rstrip().split()
-                    data[lba] = val
+                    data[str(lba)] = val
         return data
 
     def _save_nand_data(self, data: dict) -> None:
