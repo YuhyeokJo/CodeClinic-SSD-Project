@@ -52,16 +52,33 @@ class SSD(Device):
                 f.write(f"{lba} {val}\n")
 
 
+def decimal_lba(lba: str):
+    if not lba.isdigit():
+        raise argparse.ArgumentTypeError(f"LBA {lba}는 10진수 숫자여야 합니다.")
+    return int(lba)
+
+
+def hex_value(value: str):
+    if not value.startswith("0x"):
+        raise argparse.ArgumentTypeError(f"Value {value}는 '0x'로 시작해야 합니다.")
+    if len(value) != 10:
+        raise argparse.ArgumentTypeError(f"Value {value}는 총 10자리여야 합니다. 예: 0x1234ABCD")
+    hex_part = value[2:]
+    if not re.fullmatch(r"[0-9a-fA-F]{8}", hex_part):
+        raise argparse.ArgumentTypeError(f"Value {value}는 8자리 16진수여야 합니다 (0-9, A-F).")
+    return value[0:2] + hex_part.upper()
+
+
 def main():
     parser = argparse.ArgumentParser(description="SSD command")
-    subparsers = parser.add_subparsers(dest="command", help="")
+    subparsers = parser.add_subparsers(dest="command")
 
     write_parser = subparsers.add_parser("W", help="Write")
-    write_parser.add_argument("lba", type=int)
-    write_parser.add_argument("value", type=str, help="Value to write")
+    write_parser.add_argument("lba", type=decimal_lba)
+    write_parser.add_argument("value", type=hex_value, help="Value to write")
 
     read_parser = subparsers.add_parser("R", help="Read")
-    read_parser.add_argument("lba", type=int, help="LBA to read from")
+    read_parser.add_argument("lba", type=decimal_lba, help="LBA to read from")
 
     try:
         args = parser.parse_args()

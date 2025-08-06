@@ -28,10 +28,10 @@ def ssd_instance():
 def test_main_write_command(ssd_instance, mocker: MockerFixture):
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
-    sys.argv = ['ssd.py', 'W', '10', '0xABCDEF01' ]
+    sys.argv = ['ssd.py', 'W', '10', '0xAAAABBBB' ]
     ssd.main()
 
-    mock_ssd.write.assert_called_once_with(10, '0xABCDEF01')
+    mock_ssd.write.assert_called_once_with(10, '0xAAAABBBB')
     mock_ssd.read.assert_not_called()
 
 
@@ -49,6 +49,52 @@ def test_main_other_command(ssd_instance, mocker: MockerFixture):
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
     sys.argv = ['ssd.py', 'K', '10']
+    with pytest.raises(SystemExit):
+        ssd.main()
+
+    mock_ssd.read.assert_not_called()
+    mock_ssd.write.assert_not_called()
+
+
+def test_lba_should_be_decimal(ssd_instance, mocker: MockerFixture):
+    """
+    [LBA] : 10진수로 입력 받음
+    """
+    mock_ssd = mocker.Mock(spec=SSD)
+    mocker.patch('device.ssd.SSD', return_value=mock_ssd)
+
+    sys.argv = ['ssd.py', 'W', 'error', "0xAAAABBBB"]
+    with pytest.raises(SystemExit):
+        ssd.main()
+
+    sys.argv = ['ssd.py', 'W', '0xB', "0xAAAABBBBB"]
+    with pytest.raises(SystemExit):
+        ssd.main()
+
+    mock_ssd.read.assert_not_called()
+    mock_ssd.write.assert_not_called()
+
+
+def test_value_always_startswith_0x_and_length_10(ssd_instance, mocker: MockerFixture):
+    """
+    [Value] : 항상 0x가 붙으며 10 글자로 표기한다. ( 0x00000000  ~  0xFFFFFFFF)
+    """
+    mock_ssd = mocker.Mock(spec=SSD)
+    mocker.patch('device.ssd.SSD', return_value=mock_ssd)
+
+    sys.argv = ['ssd.py', 'W', '2', "AA"]
+    with pytest.raises(SystemExit):
+        ssd.main()
+
+    sys.argv = ['ssd.py', 'W', '2', '0xa']
+    with pytest.raises(SystemExit):
+        ssd.main()
+
+    sys.argv = ['ssd.py', 'W', '2', '0xA']
+    with pytest.raises(SystemExit):
+        ssd.main()
+
+    sys.argv = ['ssd.py', 'W', '2', '0xAAAABBBBBB']
     with pytest.raises(SystemExit):
         ssd.main()
 
