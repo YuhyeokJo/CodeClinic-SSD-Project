@@ -15,8 +15,7 @@ class SSD(Device):
 
     def write(self, lba: int, value: int | str) -> None:
         if lba < 0 or 99 < lba:
-            with open(self.ssd_output_file, "w") as f:
-                f.write("ERROR")
+            self._write_output("ERROR")
             return
 
         data = self._load_nand_data()
@@ -25,14 +24,17 @@ class SSD(Device):
 
     def read(self, lba: int) -> None:
         if lba < 0 or 99 < lba:
-            with open(self.ssd_output_file, "w") as f:
-                f.write("ERROR")
+            self._write_output("ERROR")
             return
 
         data = self._load_nand_data()
         result = data.get(str(lba), INITIALIZED_DATA)
         with open(self.ssd_output_file, "w") as f:
             f.write(f"{lba} {result}\n")
+
+    def _write_output(self, content):
+        with open(self.ssd_output_file, "w") as f:
+            f.write(content)
 
     def _load_nand_data(self) -> dict:
         data = {}
