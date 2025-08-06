@@ -8,7 +8,7 @@ LBA_START = 0
 LBA_END = 100
 
 FULL_WRITE_DONE = "[Full Write] Done"
-
+INVALLID_COMMAND = "INVALID COMMAND"
 
 class FullWrite(Command):
     def __init__(self, driver: SSDDriver):
@@ -17,7 +17,7 @@ class FullWrite(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            return "INVALID COMMAND"
+            return INVALLID_COMMAND
 
         data = args[0]
 
