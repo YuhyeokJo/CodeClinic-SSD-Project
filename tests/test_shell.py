@@ -49,3 +49,19 @@ def test_read_command_input_with_wrong_lba(capsys, mocker: MockerFixture):
     # Assert
     last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-1]
     assert last_shell_line == "[Read] INVALID COMMAND"
+
+
+def test_read_command_correctly_until_exit(capsys, mocker: MockerFixture):
+    # Arrange
+    driver = mocker.Mock(spec=SSDDriver)
+    test_shell = TestShell(driver)
+    input_patch = mocker.patch("shell.test_shell.input")
+    driver.read.side_effect = ["0x00000003"]
+    input_patch.side_effect = ["read 3", "exit"]
+
+    # Act
+    test_shell.run()
+
+    # Assert
+    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-1]
+    assert last_shell_line == "[Read] LBA 3: 0x00000003"

@@ -19,12 +19,13 @@ class TestShell:
         self._commands["fullread"] = FullRead(self._driver)
 
     def run(self):
-        line = input("Shell> ").strip()
-        if not line:
-            return
-        parts = line.split()
-        cmd = parts[0]
-        args = parts[1:]
+        for _ in range(1):
+            line = input("Shell> ").strip()
+            if not line:
+                return
+            parts = line.split()
+            cmd = parts[0]
+            args = parts[1:]
 
-        if cmd in self._commands:
-            print(self._commands[cmd].execute(args))
+            if cmd in self._commands:
+                print(self._commands[cmd].execute(args))
