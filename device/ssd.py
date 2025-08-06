@@ -1,6 +1,7 @@
 from pathlib import Path
-from device.device import Device
+from device import Device
 import os
+import argparse
 
 
 class SSD(Device):
@@ -34,3 +35,28 @@ class SSD(Device):
         result = data.get(address, "0x00000000")
         with open(self.ssd_output_file, "w") as f:
             f.write(f"{address} {result}\n")
+
+
+if "__main__" == __name__:
+    parser = argparse.ArgumentParser(description="SSD command")
+    subparsers = parser.add_subparsers(dest="command", help="")
+
+    write_parser = subparsers.add_parser("W", help="Write")
+    write_parser.add_argument("lba", type=int)
+    write_parser.add_argument("value", type=str, help="Value to write")
+
+    read_parser = subparsers.add_parser("R", help="Read")
+    read_parser.add_argument("lba", type=int, help="LBA to read from")
+
+    try:
+        args = parser.parse_args()
+    except SystemExit as e:
+        exit(1)
+
+    ssd = SSD()
+    if args.command == "W":
+        print(f"{args.command=}, {args.lba=}, {args.value=}")
+        ssd.write(str(args.lba), args.value)
+    elif args.command == "R":
+        print(f"{args.command=}, {args.lba=}")
+        ssd.read(str(args.lba))
