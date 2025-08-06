@@ -3,7 +3,7 @@ from shell.driver import SSDDriver
 from shell.command import Command
 
 
-class Fullread(Command):
+class FullRead(Command):
     def __init__(self, driver: SSDDriver):
         self.driver = driver
 

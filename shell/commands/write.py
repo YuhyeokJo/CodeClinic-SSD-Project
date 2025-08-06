@@ -4,7 +4,7 @@ from shell.command import Command
 from shell.driver import SSDDriver
 
 
-class WriteCommand(Command):
+class Write(Command):
     def __init__(self, driver: SSDDriver):
         self._driver = driver
 
