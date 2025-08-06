@@ -24,11 +24,10 @@ def mocked_driver_shell_input(mocker: MockerFixture):
 def test_main_correct_input(capsys, mocker):
     input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect = [
-        "help",
-        "exit",
+        "help write",
         "write 3 0x00000001",
         "read 3",
-        "fullwrite",
+        "fullwrite 0x00000001",
         "fullread",
         "exit"
     ]
