@@ -31,3 +31,7 @@ class WriteValidator(ArgumentValidator):
 class FullReadValidator(ArgumentValidator):
     def validate(self, args: list[str]) -> bool:
         return len(args) == 0
+
+class FullWriteValidator(ArgumentValidator):
+    def validate(self, args: list[str]) -> bool:
+        return len(args) == 1 and is_valid_hex_data(args[0])
