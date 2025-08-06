@@ -13,6 +13,7 @@ SCRIPT_2_LOOP_SIZE = 30
 SCRIPT_3_LBA_SIZE = 2
 SCRIPT_3_LOOP_SIZE = 200
 
+
 def test_full_write_and_read_compare_count(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)

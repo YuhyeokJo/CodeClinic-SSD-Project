@@ -3,8 +3,7 @@ from shell.driver import SSDDriver
 from shell.commands.write import Write
 from shell.commands.read import Read
 
-INVALID = "INVALID"
-SCRIPT_INVALID_COMMAND = "[SCRIPT] INVALID COMMAND"
+INVALID_COMMAND = "INVALID COMMAND"
 SCRIPT_PASS = "[SCRIPT] PASS"
 SCRIPT_FAIL = "[SCRIPT] FAIL"
 
@@ -22,8 +21,8 @@ class ScriptRunner:
         for group in groups:
             for lba in group:
                 res = self.write_command.execute([lba, inputs[lba]])
-                if INVALID in res:
-                    return SCRIPT_INVALID_COMMAND
+                if INVALID_COMMAND in res:
+                    return INVALID_COMMAND
                 results.append(self._read_compare([lba, inputs[lba]]))
         if not all(results):
             return SCRIPT_FAIL
@@ -46,8 +45,8 @@ class ScriptRunner:
         for _ in range(30):
             for lba in lbas:
                 res = self.write_command.execute([lba, value])
-                if INVALID in res:
-                    return SCRIPT_INVALID_COMMAND
+                if INVALID_COMMAND in res:
+                    return INVALID_COMMAND
             for lba in lbas:
                 results.append(self._read_compare([lba, value]))
         if not all(results):
@@ -59,11 +58,11 @@ class ScriptRunner:
         value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
         for _ in range(200):
             res = self.write_command.execute(["0", value])
-            if INVALID in res:
-                return SCRIPT_INVALID_COMMAND
+            if INVALID_COMMAND in res:
+                return INVALID_COMMAND
             res = self.write_command.execute(["99", value])
-            if INVALID in res:
-                return SCRIPT_INVALID_COMMAND
+            if INVALID_COMMAND in res:
+                return INVALID_COMMAND
         results = []
         for _ in range(200):
             results.append(self._read_compare(["0", value]))
