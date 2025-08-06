@@ -160,7 +160,7 @@ def test_read_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance):
     """
     ssd_instance.read(-1)
     with open(ssd_instance.ssd_output_file, "r") as f:
-        actual = f.readlines()[0]
+        actual = f.read()
 
     assert actual == "ERROR"
 
@@ -171,7 +171,7 @@ def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance)
     """
     ssd_instance.write(-1, "0xffffffff")
     with open(ssd_instance.ssd_output_file, "r") as f:
-        actual = f.readlines()[0]
+        actual = f.read()
 
     assert actual == "ERROR"
 
