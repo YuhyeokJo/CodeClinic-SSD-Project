@@ -13,30 +13,42 @@ class SSD(Device):
         self.ssd_nand_file = self.output_dir / "ssd_nand.txt"
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
 
-    def write(self, address: int, value: int | str) -> None:
+    def write(self, lba: int, value: int | str) -> None:
+        if lba < 0 or 99 < lba:
+            self._write_output("ERROR")
+            return
+
         data = self._load_nand_data()
-        data[str(address)] = value if isinstance(value, str) else hex(value)
+        data[str(lba)] = value if isinstance(value, str) else hex(value)
         self._save_nand_data(data)
 
-    def read(self, address: int) -> None:
+    def read(self, lba: int) -> None:
+        if lba < 0 or 99 < lba:
+            self._write_output("ERROR")
+            return
+
         data = self._load_nand_data()
-        result = data.get(address, INITIALIZED_DATA)
+        result = data.get(str(lba), INITIALIZED_DATA)
         with open(self.ssd_output_file, "w") as f:
-            f.write(f"{address} {result}\n")
+            f.write(f"{lba} {result}\n")
+
+    def _write_output(self, content):
+        with open(self.ssd_output_file, "w") as f:
+            f.write(content)
 
     def _load_nand_data(self) -> dict:
         data = {}
         if os.path.exists(self.ssd_nand_file):
             with open(self.ssd_nand_file, "r") as f:
                 for line in f:
-                    addr, val = line.rstrip().split()
-                    data[addr] = val
+                    lba, val = line.rstrip().split()
+                    data[str(lba)] = val
         return data
 
     def _save_nand_data(self, data: dict) -> None:
         with open(self.ssd_nand_file, "w") as f:
-            for addr, val in sorted(data.items()):
-                f.write(f"{addr} {val}\n")
+            for lba, val in sorted(data.items()):
+                f.write(f"{lba} {val}\n")
 
 
 def main():
