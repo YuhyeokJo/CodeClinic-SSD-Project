@@ -27,3 +27,7 @@ class WriteValidator(ArgumentValidator):
             return False
         lba, data = args
         return is_valid_lba(lba) and is_valid_hex_data(data)
+
+class FullReadValidator(ArgumentValidator):
+    def validate(self, args: list[str]) -> bool:
+        return len(args) == 0

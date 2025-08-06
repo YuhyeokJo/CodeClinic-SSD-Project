@@ -8,9 +8,9 @@ class Read(Command):
         self._driver = driver
         self._validator = ReadValidator()
 
-    def execute(self, args: list[str])->str:
+    def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-           return "INVALID COMMAND"
+            return "INVALID COMMAND"
 
         lba = args[0]
         result = self._driver.read(lba)
