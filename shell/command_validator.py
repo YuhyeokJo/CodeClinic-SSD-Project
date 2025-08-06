@@ -39,3 +39,7 @@ class FullWriteValidator(ArgumentValidator):
 class HelpValidator(ArgumentValidator):
     def validate(self, args: list[str]) -> bool:
         return len(args) > 0 and len(args) <= 1 and (not args or args[0].lower() in VALID_COMMANDS)
+
+class ExitValidator(ArgumentValidator):
+    def validate(self, args: list[str]) -> bool:
+        return len(args) == 0
