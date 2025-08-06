@@ -5,6 +5,8 @@ from shell.commands.fullread import FullRead
 from shell.commands.fullwrite import FullWrite
 from shell.commands.read import Read
 from shell.commands.write import Write
+from shell.commands.help import Help
+from shell.commands.exit import Exit
 from shell.driver import SSDDriver
 from shell.test_shell import TestShell
 
@@ -25,6 +27,20 @@ def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     assert isinstance(test_shell._commands["read"], Read)
     assert isinstance(test_shell._commands["fullwrite"], FullWrite)
     assert isinstance(test_shell._commands["fullread"], FullRead)
+    assert isinstance(test_shell._commands["exit"], Exit)
+    assert isinstance(test_shell._commands["help"], Help)
+
+def test_not_exist_command(capsys, mocked_driver_shell_input):
+    # Arrange
+    driver, test_shell, input_patch = mocked_driver_shell_input
+    input_patch.return_value = "not_exist"
+
+    # Act
+    test_shell.run()
+
+    # Assert
+    last_shell_line = capsys.readouterr().out.strip("\n")
+    assert last_shell_line == "INVALID COMMAND"
 
 def test_read_command_input_with_correct_command(capsys, mocked_driver_shell_input):
     # Arrange
@@ -36,7 +52,7 @@ def test_read_command_input_with_correct_command(capsys, mocked_driver_shell_inp
     test_shell.run()
 
     # Assert
-    last_shell_line = capsys.readouterr().out.strip("\n")
+    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-2]
     assert last_shell_line == "[Read] LBA 3: 0x00000001"
 
 
@@ -50,7 +66,7 @@ def test_read_command_input_with_wrong_lba(capsys, mocked_driver_shell_input):
     test_shell.run()
 
     # Assert
-    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-1]
+    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-2]
     assert last_shell_line == "[Read] INVALID COMMAND"
 
 
@@ -64,5 +80,5 @@ def test_read_command_correctly_until_exit(capsys, mocked_driver_shell_input):
     test_shell.run()
 
     # Assert
-    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-1]
+    last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-2]
     assert last_shell_line == "[Read] LBA 3: 0x00000003"
