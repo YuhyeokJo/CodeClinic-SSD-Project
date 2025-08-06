@@ -55,10 +55,8 @@ def main():
 
     ssd = SSD()
     if args.command == "W":
-        print(f"{args.command=}, {args.lba=}, {args.value=}")
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":
-        print(f"{args.command=}, {args.lba=}")
         ssd.read(str(args.lba))
 
 
