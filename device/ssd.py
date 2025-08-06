@@ -37,7 +37,7 @@ class SSD(Device):
             f.write(f"{address} {result}\n")
 
 
-if "__main__" == __name__:
+def main():
     parser = argparse.ArgumentParser(description="SSD command")
     subparsers = parser.add_subparsers(dest="command", help="")
 
@@ -60,3 +60,7 @@ if "__main__" == __name__:
     elif args.command == "R":
         print(f"{args.command=}, {args.lba=}")
         ssd.read(str(args.lba))
+
+
+if __name__ == "__main__":
+    main()
