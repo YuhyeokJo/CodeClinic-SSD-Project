@@ -19,5 +19,5 @@ def test_fullread_result(mocker: MockerFixture):
     full_reader = FullRead(driver)
     result = ""
     for lba, value in enumerate(expected_output):
-        result += f"\n [Read] LBA {lba} : {value}"
+        result += f"\n [Read] LBA {lba}: {value}"
     assert full_reader.execute([]) == result
