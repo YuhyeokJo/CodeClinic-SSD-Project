@@ -8,13 +8,13 @@ from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
-from shell.test_shell import TestShell
+from shell.shell_test import TestShell
 
 @pytest.fixture
 def mocked_driver_shell_input(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     test_shell = TestShell(driver)
-    input_patch = mocker.patch("shell.test_shell.input")
+    input_patch = mocker.patch("shell.shell_test.input")
 
     return driver, test_shell, input_patch
 
