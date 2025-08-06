@@ -25,7 +25,7 @@ def test_read_command_input_with_correct_command(capsys, mocker: MockerFixture):
     test_shell = TestShell(driver)
     input_patch = mocker.patch("shell.test_shell.input")
     driver.read.return_value = "0x00000001"
-    input_patch.return_value = "read 3"
+    input_patch.side_effect = ["read 3", "exit"]
 
     # Act
     test_shell.run()
@@ -41,7 +41,7 @@ def test_read_command_input_with_wrong_lba(capsys, mocker: MockerFixture):
     test_shell = TestShell(driver)
     input_patch = mocker.patch("shell.test_shell.input")
     driver.read.return_value = "0x00000001"
-    input_patch.return_value = "read -1"
+    input_patch.side_effect = ["read -1", "exit"]
 
     # Act
     test_shell.run()
