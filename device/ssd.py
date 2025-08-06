@@ -14,11 +14,21 @@ class SSD(Device):
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
 
     def write(self, address: int, value: int | str) -> None:
+        if address < 0 or 99 < address:
+            with open(self.ssd_output_file, "w") as f:
+                f.write("ERROR")
+            return
+
         data = self._load_nand_data()
         data[str(address)] = value if isinstance(value, str) else hex(value)
         self._save_nand_data(data)
 
     def read(self, address: int) -> None:
+        if address < 0 or 99 < address:
+            with open(self.ssd_output_file, "w") as f:
+                f.write("ERROR")
+            return
+
         data = self._load_nand_data()
         result = data.get(address, INITIALIZED_DATA)
         with open(self.ssd_output_file, "w") as f:

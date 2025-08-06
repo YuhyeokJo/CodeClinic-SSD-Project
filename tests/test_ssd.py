@@ -113,7 +113,7 @@ def test_read_init_value_should_be_0x00000000(ssd_instance):
     """
     기록이 한적이 없는 LBA를 읽으면 0x00000000 으로 읽힌다.
     """
-    ssd_instance.read(lba=0)
+    ssd_instance.read(0)
     data = {}
     with open(ssd_instance.ssd_output_file, "r") as f:
         for line in f:
@@ -135,29 +135,28 @@ def test_read_origin_ssd_output_should_be_gone(ssd_instance):
     """
      ssd_output.txt 에 읽은 값이 적힌다. (기존 데이터는 사라진다.)
     """
-    ...
     pytest.fail()
-
-
-def test_read_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd):
 
 def test_read_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance):
     """
      • 잘못된LBA 범위가 입력되면ssd_output.txt에 "ERROR"가 기록된다.
     """
-    ...
-    pytest.fail()
+    ssd_instance.read(-1)
+    with open(ssd_instance.ssd_output_file, "r") as f:
+        actual = f.readlines()[0]
 
+    assert actual == "ERROR"
 
-def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd):
 
 def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance):
     """
      • 잘못된LBA 범위가입력되면ssd_output.txt에 "ERROR"가 기록된다.
     """
-    ...
-    pytest.fail()
+    ssd_instance.write(-1, "0xffffffff")
+    with open(ssd_instance.ssd_output_file, "r") as f:
+        actual = f.readlines()[0]
 
+    assert actual == "ERROR"
 
 
 def test_lba_should_be_decimal(ssd_instance):
