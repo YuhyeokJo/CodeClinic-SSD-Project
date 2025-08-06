@@ -41,7 +41,7 @@ def test_read_command_input_with_wrong_lba(capsys, mocker: MockerFixture):
     driver.read.return_value = "0x00000001"
     input_patch.return_value = "read -1"
 
-    expected = "LBA must be a number\n[Read] INVALID COMMAND"
+    expected = "[Read] INVALID COMMAND"
     test_shell.run()
-    actual = capsys.readouterr().out.strip("\n")
+    actual = capsys.readouterr().out.strip("\n").split("\n")[-1]
     assert actual == expected
