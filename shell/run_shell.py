@@ -41,9 +41,11 @@ class TestShell:
             if isinstance(command, Exit):
                 return
 
+
 def main():
     shell = TestShell(SSDDriver())
     shell.run()
+
 
 if __name__ == "__main__":
     main()
