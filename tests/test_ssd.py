@@ -70,7 +70,7 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd_instance):
     ssd_instance.write(cmd.lba, cmd.value)
 
     with open(ssd_instance.ssd_nand_file, "r") as f:
-        lines = f.readlines()[0]
+        lines = f.read()
 
     # assert
     assert lines == f"{cmd.lba} {hex(cmd.value)}\n"
