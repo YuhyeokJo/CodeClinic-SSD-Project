@@ -34,7 +34,7 @@ class TestShell:
 
             if cmd not in self._commands:
                 print("INVALID COMMAND")
-                return
+                continue
 
             command = self._commands[cmd]
             print(self._commands[cmd].execute(args))
