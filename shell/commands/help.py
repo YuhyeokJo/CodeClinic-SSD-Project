@@ -31,4 +31,3 @@ class Help(Command):
 
         cmd = args[0].lower()
         return self.format_help(cmd, self._help_map[cmd])
-

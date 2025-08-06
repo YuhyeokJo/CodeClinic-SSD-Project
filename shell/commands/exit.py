@@ -4,7 +4,7 @@ from shell.driver import SSDDriver
 
 
 class Exit(Command):
-    def __init__(self, driver:SSDDriver):
+    def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._validator = ExitValidator()
 
