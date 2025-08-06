@@ -1,7 +1,7 @@
 import pytest
 from pytest_mock import MockerFixture
 
-from shell.commands.write import WriteCommand
+from shell.commands.write import Write
 from shell.driver import SSDDriver
 
 
@@ -12,7 +12,7 @@ def test_write_correctly(capsys, mocker: MockerFixture):
     #arrange
     mocked_ssd = mocker.Mock(spec=SSDDriver)
     mocked_ssd.write.return_value = True
-    write_command = WriteCommand(mocked_ssd)
+    write_command = Write(mocked_ssd)
 
     #act
     actual = write_command.execute(["3", "0x00000001"])
@@ -33,7 +33,7 @@ def test_write_wrongly_with_minus_lba(mocker: MockerFixture, wrong_argument):
     #arrange
     mocked_ssd = mocker.Mock(spec=SSDDriver)
     mocked_ssd.write.return_value = True
-    write_command = WriteCommand(mocked_ssd)
+    write_command = Write(mocked_ssd)
 
     for wrong_arg in wrong_argument:
         #act
