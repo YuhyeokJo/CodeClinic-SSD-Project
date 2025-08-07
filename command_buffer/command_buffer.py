@@ -89,13 +89,13 @@ class CommandBuffer:
 
         result = []
         for lba, w_cmd in latest_write.items():
-            _, _, _, lba, _ = w_cmd
+            _, write_slot, _, lba, _ = w_cmd
             lba = int(lba)
             erased = False
-            for _, _, _, erase_lba, size in latest_erase.values():
+            for _, erase_slot, _, erase_lba, size in latest_erase.values():
                 erase_lba = int(erase_lba)
                 size = int(size)
-                if erase_lba <= lba < erase_lba + size:
+                if erase_lba <= lba < erase_lba + size and erase_slot > write_slot:
                     erased = True
                     break
             if not erased:

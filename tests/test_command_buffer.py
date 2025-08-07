@@ -106,3 +106,18 @@ def test_erase_when_write_within_valid_range(capsys):
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
+
+
+def test_erase_skipped_if_erase_invoked_before_valid_write(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "5")
+    cb.add_command("W", "3", "0x12345678")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_W_3_0x12345678\n"
+                            " - 2_E_1_5\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
