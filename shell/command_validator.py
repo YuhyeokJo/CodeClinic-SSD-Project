@@ -9,7 +9,7 @@ SIZE_RANGE = range(1, 11)
 
 
 def is_valid_lba(lba: str) -> bool:
-    return int(lba) in LBA_RANGE and lba.isdigit()
+    return lba.isdigit() and int(lba) in LBA_RANGE
 
 
 def is_valid_hex_data(data: str) -> bool:
