@@ -1,3 +1,7 @@
+import argparse
+from dataclasses import dataclass
+from pathlib import Path
+
 from shell.command import Command
 from shell.commands.fullread import FullRead
 from shell.commands.fullwrite import FullWrite
@@ -14,7 +18,7 @@ from shell.logger import Logger
 INVALID_COMMAND = "INVALID COMMAND"
 
 
-class TestShell:
+class InteractiveShell:
     def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._commands: dict[str, Command] = {}
@@ -63,6 +67,101 @@ class TestShell:
                 return
 
 
-def main():
-    shell = TestShell(SSDDriver())
+class BatchShellError(Exception):
+    """Base error"""
+
+
+class NotExistingTestScriptError(BatchShellError):
+    """Not existing scripts"""
+
+
+class NotExistingFileError(BatchShellError):
+    """Not existing scripts"""
+
+
+class BatchShell:
+    @dataclass
+    class Script:
+        full_name: str
+        command: Command
+
+    def __init__(self, driver: SSDDriver):
+        self._driver = driver
+        self._script_collection_file_path = None
+        self._script_list: list[BatchShell.Script] = []
+        self._registered_script: dict[str, BatchShell.Script] = {}
+        self._register_builtin_script()
+
+    @property
+    def script_collection_file_path(self):
+        return self._script_collection_file_path
+
+    @script_collection_file_path.setter
+    def script_collection_file_path(self, file_path: Path):
+        if not file_path.exists():
+            raise NotExistingFileError(f"{file_path} does not exist")
+
+        with file_path.open("r") as f:
+            for line in f.readlines():
+                line = line.strip("\n")
+                if line in self._registered_script:
+                    self._script_list.append(self._registered_script[line])
+                else:
+                    raise NotExistingTestScriptError(f"{line} is not registered test script")
+
+        self._script_collection_file_path = file_path
+
+    def _run_script(self, script: Script):
+        result = script.command.execute([])
+        return result == "PASS"
+
+    def run(self):
+        for script in self._script_list:
+            print(f"{script.full_name}  ___  Run...", end="", flush=True)
+            if self._run_script(script):
+                print("Pass", flush=True)
+            else:
+                print("Fail", flush=True)
+
+    def _register_builtin_script(self):
+        self._registered_script["1_"] = self._registered_script["1_FullWriteAndReadCompare"] \
+            = BatchShell.Script("1_FullWriteAndReadCompare", Script1(self._driver))
+
+        self._registered_script["2_"] = self._registered_script["2_PartialLBAWrite"] \
+            = BatchShell.Script("2_PartialLBAWrite", Script2(self._driver))
+
+        self._registered_script["3_"] = self._registered_script["3_WriteReadAging"] \
+            = BatchShell.Script("3_WriteReadAging", Script3(self._driver))
+
+        self._registered_script["4_"] = self._registered_script["4_EraseAndWriteAging"] \
+            = BatchShell.Script("4_EraseAndWriteAging", Script4(self._driver))
+
+
+def run_interactive_shell():
+    shell = InteractiveShell(SSDDriver())
     shell.run()
+
+
+def exist_file(file_name: str) -> str:
+    if not Path(file_name).exists():
+        raise argparse.ArgumentTypeError(f"{file_name}은 존재하지 않는 파일입니다.")
+    return file_name
+
+
+def run_batch_shell(file_name: str):
+    shell = BatchShell(SSDDriver())
+    shell.script_collection_file_path = Path(file_name)
+    shell.run()
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Shell mode")
+
+    parser.add_argument("script_collection_file_name", nargs='?', type=exist_file)
+
+    args = parser.parse_args()
+
+    if args.script_collection_file_name is None:
+        run_interactive_shell()
+    else:
+        run_batch_shell(args.script_collection_file_name)
