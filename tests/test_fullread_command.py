@@ -1,4 +1,6 @@
 from pytest_mock import MockerFixture
+
+from shell.commands.fullwrite import FullWrite
 from shell.driver import SSDDriver
 from shell.commands.fullread import FullRead
 
@@ -25,6 +27,8 @@ def test_fullread_result(mocker: MockerFixture):
 
 def test_fullread_command(mocker: MockerFixture):
     driver = SSDDriver()
+    full_write = FullWrite(driver)
+    full_write.execute(["0xABCDFFFF"])
     full_reader = FullRead(driver)
     result = ""
     for lba in range(100):

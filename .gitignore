@@ -2,3 +2,5 @@
 .idea
 output
 buffer
+logs
+tests/logs

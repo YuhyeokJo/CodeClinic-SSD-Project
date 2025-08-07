@@ -25,3 +25,11 @@ class Script3(Command):
 
     def execute(self, args: list[str] = None) -> str:
         return self.script_runner.write_read_aging()
+
+
+class Script4(Command):
+    def __init__(self, driver: SSDDriver):
+        self.script_runner = ScriptRunner(driver)
+
+    def execute(self, args: list[str] = None) -> str:
+        return self.script_runner.erase_and_write_aging()
