@@ -150,6 +150,6 @@ def test_batch_shell_with_correct_file_and_success_script(tmp_path, capsys, mock
     # Act
     batch_shell.run()
 
-    #Assert
+    # Assert
     actual = capsys.readouterr().out.strip("\n")
     assert actual == "1_FullWriteAndReadCompare  ___  Run...Pass"

@@ -1,4 +1,5 @@
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 
 from shell.command import Command
@@ -67,28 +68,51 @@ class InteractiveShell:
 
 
 class BatchShell:
+    @dataclass
+    class Script:
+        full_name: str
+        command: Command
+
     def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._script_collection_file_path = None
+        self._script_list: list[BatchShell.Script] = []
+        self._registered_script: dict[str, BatchShell.Script] = {}
+        self._register_builtin_script()
 
     @property
-    def script_collection_file(self):
+    def script_collection_file_path(self):
         return self._script_collection_file_path
 
-    @script_collection_file.setter
-    def script_collection_file(self, file_path: Path):
+    @script_collection_file_path.setter
+    def script_collection_file_path(self, file_path: Path):
         self._script_collection_file_path = file_path
+        with self._script_collection_file_path.open("r") as f:
+            for line in f.readlines():
+                line = line.strip("\n")
+                if line in self._registered_script:
+                    self._script_list.append(self._registered_script[line])
 
-    def _run_script(self):
+    def _run_script(self, script: Script):
         pass
 
     def run(self):
-        print("1_FullWriteAndReadCompare  ___  Run...Pass")
+        for script in self._script_list:
+            print(f"{script.full_name}  ___  Run...", end="")
+            if self._run_script(script):
+                print("Pass")
+            else:
+                print("Fail")
+
+    def _register_builtin_script(self):
+        self._registered_script["1_"] = self._registered_script["1_FullWriteAndReadCompare"] \
+            = BatchShell.Script("1_FullWriteAndReadCompare", Script1(self._driver))
 
 
 def run_interactive_shell():
     shell = InteractiveShell(SSDDriver())
     shell.run()
+
 
 def exist_file(file_name: str) -> str:
     if not Path(file_name).exists():
