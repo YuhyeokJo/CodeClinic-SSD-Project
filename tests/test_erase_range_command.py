@@ -8,7 +8,7 @@ INVALID_COMMAND = "INVALID COMMAND"
 DONE = "[Erase Range] Done"
 
 
-def test_erase_correctly(capsys, mocker: MockerFixture):
+def test_erase_range_correctly(capsys, mocker: MockerFixture):
     mocked_ssd = mocker.Mock(spec=SSDDriver)
     mocked_ssd.erase.return_value = True
     erase_command = EraseRange(mocked_ssd)
@@ -16,7 +16,7 @@ def test_erase_correctly(capsys, mocker: MockerFixture):
     assert actual == DONE
 
 
-def test_erase_correctly_with_over_size(capsys, mocker: MockerFixture):
+def test_erase_range_correctly_with_over_size(capsys, mocker: MockerFixture):
     mocked_ssd = mocker.Mock(spec=SSDDriver)
     mocked_ssd.erase.return_value = True
     erase_command = EraseRange(mocked_ssd)
@@ -31,7 +31,7 @@ def test_erase_correctly_with_over_size(capsys, mocker: MockerFixture):
         ["-1", "5"],
     ]
 )
-def test_erase_invalid_result_with_wrong_argument(mocker: MockerFixture, wrong_argument):
+def test_erase_range_invalid_result_with_wrong_argument(mocker: MockerFixture, wrong_argument):
     mocked_ssd = mocker.Mock(spec=SSDDriver)
     mocked_ssd.erase.return_value = True
     erase_command = EraseRange(mocked_ssd)
