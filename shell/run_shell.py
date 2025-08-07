@@ -2,10 +2,12 @@ from shell.command import Command
 from shell.commands.fullread import FullRead
 from shell.commands.fullwrite import FullWrite
 from shell.commands.read import Read
-from shell.commands.script import Script1, Script2, Script3
 from shell.commands.write import Write
+from shell.commands.erase import Erase
+from shell.commands.erase_range import EraseRange
 from shell.commands.help import Help
 from shell.commands.exit import Exit
+from shell.commands.script import Script1, Script2, Script3
 from shell.driver import SSDDriver
 from shell.logger import Logger
 
@@ -25,6 +27,8 @@ class TestShell:
         self._commands["read"] = Read(self._driver)
         self._commands["fullwrite"] = FullWrite(self._driver)
         self._commands["fullread"] = FullRead(self._driver)
+        self._commands["erase"] = Erase(self._driver)
+        self._commands["erase_range"] = EraseRange(self._driver)
         self._commands["exit"] = Exit(self._driver)
         self._commands["help"] = Help(self._driver)
         self._commands["1_"] = self._commands["1_FullWriteAndReadCompare"] = Script1(self._driver)
