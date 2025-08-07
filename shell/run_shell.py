@@ -94,7 +94,8 @@ class BatchShell:
                     self._script_list.append(self._registered_script[line])
 
     def _run_script(self, script: Script):
-        pass
+        result = script.command.execute([])
+        return result == "[SCRIPT] PASS"
 
     def run(self):
         for script in self._script_list:
