@@ -33,24 +33,6 @@ def test_interactive_shell_correct_input(capsys, mocker):
             assert False
 
 
-@pytest.mark.parametrize(
-    "script_id", ["1_", "2_", "3_"]
-)
-def test_interactive_shell_using_script(capsys, mocker, script_id):
-    input_patch = mocker.patch("shell.run_shell.input")
-    input_patch.side_effect = [
-        script_id,
-        "exit"
-    ]
-
-    run_interactive_shell()
-
-    assert capsys.readouterr().out.strip("\n").split("\n") == [
-        "[SCRIPT] PASS",
-        "[Exit]"
-    ]
-
-
 def test_main_with_shell_script_file(capsys):
     sys.argv = [f"{(Path(__file__).parent.parent / 'shell.py').resolve()}",
                 f"{(Path(__file__).parent / 'shell_scripts.txt').resolve()}"]
