@@ -87,8 +87,8 @@ class CommandBuffer:
                 if lba not in latest_erase or size > int(latest_erase[lba][4]):
                     latest_erase[lba] = cmd
 
+        # 3. erase 범위에 write가 선행되어 있으면 제거
         result = []
-        # 3. erase 변위에 write가 선행되어 있으면 제거
         for lba, w_cmd in latest_write.items():
             _, write_slot, _, lba, _ = w_cmd
             lba = int(lba)
@@ -102,40 +102,42 @@ class CommandBuffer:
             if not erased:
                 result.append(w_cmd)
 
-        erase_merged = []
-        for cmd in latest_erase.values():
-            _, slot, command, lba, size = cmd
+        # 4. erage 병합
+        intervals = []
+        for fname, slot, cmd, lba, size in latest_erase.values():
             lba = int(lba)
             size = int(size)
-            start1 = lba
-            end1 = lba + size - 1
+            start = lba
+            end = lba + size - 1
+            intervals.append((start, end, slot))
 
-            merged_flag = False
+        intervals.sort(key=lambda x: x[0])
 
-            for i in range(len(erase_merged)):
-                _, _, _, mlba, msize = erase_merged[i]
-                mlba = int(mlba)
-                msize = int(msize)
-                start2 = mlba
-                end2 = mlba + msize - 1
-
-                # 겹치거나 인접한 경우 병합
-                if max(start1, start2) <= min(end1, end2) + 1:
-                    new_start = min(start1, start2)
-                    new_end = max(end1, end2)
+        merged = []
+        for start, end, slot in intervals:
+            if not merged:
+                merged.append((start, end, slot))
+            else:
+                last_start, last_end, last_slot = merged[-1]
+                if start <= last_end + 1:
+                    new_start = min(start, last_start)
+                    new_end = max(end, last_end)
                     new_size = new_end - new_start + 1
 
                     if new_size <= 10:
-                        # 병합 → 기존 항목 교체
-                        new_fname = f"{slot}_E_{new_start}_{new_size}"
-                        erase_merged[i] = (new_fname, slot, "E", new_start, str(new_size))
-                        merged_flag = True
-                        break
+                        new_slot = min(slot, last_slot)
+                        merged[-1] = (new_start, new_end, new_slot)
+                    else:
+                        merged.append((start, end, slot))  # 병합 안 함
+                else:
+                    merged.append((start, end, slot))
 
-            if not merged_flag:
-                erase_merged.append(cmd)
+        for start, end, slot in merged:
+            size = end - start + 1
+            fname = f"{slot}_E_{start}_{size}"
+            result.append((fname, slot, "E", start, str(size)))
 
-        final_cmds = result + erase_merged
+        final_cmds = result
 
         for fname in files:
             if "empty" not in fname:

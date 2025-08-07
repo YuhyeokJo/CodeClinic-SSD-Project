@@ -229,3 +229,19 @@ def test_pdf_page32(capsys):
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
+
+
+def test_merge_erases_when_intermediate_erase_added(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "2")
+    cb.add_command("E", "4", "4")
+    cb.add_command("E", "2", "4")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_1_7\n"
+                            " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
