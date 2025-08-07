@@ -181,3 +181,51 @@ def test_merge_rejected_when_resulting_erase_size_exceeds_ten(capsys):
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
+
+
+def test_pdf_page30(capsys):
+    cb = CommandBuffer()
+    cb.add_command("W", "20", "0xABCDABCD")
+    cb.add_command("W", "21", "0x12341234")
+    cb.add_command("W", "20", "0xEEEEFFFF")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_W_20_0xEEEEFFFF\n"
+                            " - 2_W_21_0x12341234\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_pdf_page31(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "18", "3")
+    cb.add_command("W", "21", "0x12341234")
+    cb.add_command("E", "18", "5")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_18_5\n"
+                            " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_pdf_page32(capsys):
+    cb = CommandBuffer()
+    cb.add_command("W", "20", "0xABCDABCD")
+    cb.add_command("E", "10", "4")
+    cb.add_command("E", "12", "3")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_W_20_0xABCDABCD\n"
+                            " - 2_E_10_5\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
