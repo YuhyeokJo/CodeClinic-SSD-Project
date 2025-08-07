@@ -1,3 +1,6 @@
+import argparse
+from pathlib import Path
+
 from shell.command import Command
 from shell.commands.fullread import FullRead
 from shell.commands.fullwrite import FullWrite
@@ -62,7 +65,23 @@ class TestShell:
             if isinstance(command, Exit):
                 return
 
-
-def main():
+def run_interactive_shell():
     shell = TestShell(SSDDriver())
     shell.run()
+
+def exist_file(file_name: str) -> str:
+    if not Path(file_name).exists():
+        raise argparse.ArgumentTypeError(f"{file_name}은 존재하지 않는 파일입니다.")
+    return file_name
+
+def main():
+    parser = argparse.ArgumentParser(description="Shell mode")
+
+    parser.add_argument("script_collection_file_name", nargs='?', type=exist_file)
+
+    args = parser.parse_args()
+
+    if args.script_collection_file_name is None:
+        run_interactive_shell()
+    else:
+        raise NotImplementedError

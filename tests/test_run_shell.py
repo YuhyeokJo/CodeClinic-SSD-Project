@@ -9,7 +9,7 @@ from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
 from shell.run_shell import TestShell
-from shell.run_shell import main
+from shell.run_shell import run_interactive_shell
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def test_main_correct_input(capsys, mocker):
         "exit"
     ]
 
-    main()
+    run_interactive_shell()
 
     for output in capsys.readouterr().out.split("\n"):
         if output == "INVALID COMMAND":
@@ -46,13 +46,54 @@ def test_main_with_wrong_input_and_exit(capsys, mocker):
         "exit"
     ]
 
-    main()
+    run_interactive_shell()
 
     assert capsys.readouterr().out.strip("\n").split("\n") == [
         "INVALID COMMAND",
         "[Exit]"
     ]
 
+def test_main_using_script1(capsys, mocker):
+    input_patch = mocker.patch("shell.run_shell.input")
+    input_patch.side_effect = [
+        "1_",
+        "exit"
+    ]
+
+    run_interactive_shell()
+
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "[SCRIPT] PASS",
+        "[Exit]"
+    ]
+
+def test_main_using_script2(capsys, mocker):
+    input_patch = mocker.patch("shell.run_shell.input")
+    input_patch.side_effect = [
+        "2_",
+        "exit"
+    ]
+
+    run_interactive_shell()
+
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "[SCRIPT] PASS",
+        "[Exit]"
+    ]
+
+def test_main_using_script3(capsys, mocker):
+    input_patch = mocker.patch("shell.run_shell.input")
+    input_patch.side_effect = [
+        "3_",
+        "exit"
+    ]
+
+    run_interactive_shell()
+
+    assert capsys.readouterr().out.strip("\n").split("\n") == [
+        "[SCRIPT] PASS",
+        "[Exit]"
+    ]
 
 def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
