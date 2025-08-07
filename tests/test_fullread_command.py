@@ -21,3 +21,12 @@ def test_fullread_result(mocker: MockerFixture):
     for lba, value in enumerate(expected_output):
         result += f"\n [Read] LBA {lba}: {value}"
     assert full_reader.execute([]) == result
+
+
+def test_fullread_command(mocker: MockerFixture):
+    driver = SSDDriver()
+    full_reader = FullRead(driver)
+    result = ""
+    for lba in range(100):
+        result += f"\n [Read] LBA {lba}: 0xABCDFFFF"
+    assert full_reader.execute([]) == result

@@ -57,3 +57,10 @@ def test_write_wrongly_with_minus_lba(mocker: MockerFixture, wrong_argument):
 
         # assert
         assert actual == "INVALID COMMAND"
+
+
+def test_write_command():
+    ssd_driver = SSDDriver()
+    writeCommand = Write(ssd_driver)
+
+    assert f"[Write] Done" == writeCommand.execute(['42', "0x12345678"])

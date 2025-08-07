@@ -43,3 +43,9 @@ def test_full_write_command_success_normalize_hex(mocker: MockerFixture):
     assert full_write_command.execute(['0xAA']) == "[Full Write] Done"
     assert full_write_command.execute(['0xF']) == "[Full Write] Done"
     assert full_write_command.execute(['0x001']) == "[Full Write] Done"
+
+def test_full_write_command(mocker: MockerFixture):
+    driver = SSDDriver()
+    full_write_command = FullWrite(driver)
+
+    assert full_write_command.execute(['0xABCDFFFF']) == "[Full Write] Done"
