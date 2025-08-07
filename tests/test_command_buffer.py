@@ -108,8 +108,8 @@ def test_erase_skipped_if_erase_invoked_before_valid_write(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == (" - 1_W_3_0x12345678\n"
-                            " - 2_E_1_5\n"
+    assert captured.out == (" - 1_E_1_5\n"
+                            " - 2_W_3_0x12345678\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
@@ -179,8 +179,8 @@ def test_pdf_page30(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == (" - 1_W_20_0xEEEEFFFF\n"
-                            " - 2_W_21_0x12341234\n"
+    assert captured.out == (" - 1_W_21_0x12341234\n"
+                            " - 2_W_20_0xEEEEFFFF\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
@@ -242,5 +242,21 @@ def test_merge_fails_on_size_limit(capsys):
     assert captured.out == (" - 1_E_1_10\n"
                             " - 2_E_11_5\n"
                             " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_erase_merge_with_write_lba_optimization(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "10")
+    cb.add_command("E", "7", "10")
+    cb.add_command("E", "12", "10")
+    cb.add_command("W", "11", "0x12345678")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == (" - 1_E_1_10\n"
+                            " - 2_E_12_10\n"
+                            " - 3_W_11_0x12345678\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
