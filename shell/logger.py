@@ -20,7 +20,7 @@ class Logger:
             ts = datetime.now().strftime("%y%m%d_%H%M")
             new_path = os.path.join(self.log_dir, f"until_{ts}.log")
 
-            # 이미 같은 이름의 파일이 있다면 삭제하고 진행 (같은 이름의 파일은 없다고 가정했기 때문)
+            # 이미 같은 이름의 파일이 있다면 삭제하고 진행 (실제로 미발생하는 case라고 가정)
             if os.path.exists(new_path):
                 os.remove(new_path)
 
