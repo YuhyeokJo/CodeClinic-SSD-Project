@@ -7,6 +7,9 @@ from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
+from shell.logger import Logger
+
+INVALID_COMMAND = "INVALID COMMAND"
 
 
 class TestShell:
@@ -14,6 +17,8 @@ class TestShell:
         self._driver = driver
         self._commands: dict[str, Command] = {}
         self._register_builtin_commands()
+        self._logger = Logger()
+        self._logger.print("TestShell.__init__()", f"TEST SHELL START")
 
     def _register_builtin_commands(self):
         self._commands["write"] = Write(self._driver)
@@ -30,20 +35,28 @@ class TestShell:
         while True:
             line = input("Shell> ").strip()
             if not line:
-                print("INVALID COMMAND")
+                print(INVALID_COMMAND)
+                self._logger.print("TestShell.run()", INVALID_COMMAND)
+
                 continue
             parts = line.split()
             cmd = parts[0]
             args = parts[1:]
 
             if cmd not in self._commands:
-                print("INVALID COMMAND")
+                print(INVALID_COMMAND)
+                self._logger.print("TestShell.run()", INVALID_COMMAND)
+
                 continue
 
             command = self._commands[cmd]
-            print(self._commands[cmd].execute(args))
+            command_return = command.execute(args)
+            self._logger.print(line, command_return)
+
             if isinstance(command, Exit):
                 return
+
+            print(command_return)
 
 
 def main():
