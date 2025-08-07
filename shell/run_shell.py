@@ -52,11 +52,10 @@ class TestShell:
             command = self._commands[cmd]
             command_return = command.execute(args)
             self._logger.print(line, command_return)
+            print(command_return)
 
             if isinstance(command, Exit):
                 return
-
-            print(command_return)
 
 
 def main():
