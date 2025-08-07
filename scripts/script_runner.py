@@ -1,5 +1,4 @@
 import random
-
 from shell.driver import SSDDriver
 from shell.commands.write import Write
 from shell.commands.read import Read
