@@ -2,7 +2,7 @@ import random
 
 from pytest_mock import MockerFixture
 from shell.driver import SSDDriver
-from scripts.script_runner import ScriptRunner, SCRIPT_PASS
+from scripts.script_runner import ScriptRunner
 
 INVALID_COMMAND = "INVALID COMMAND"
 SCRIPT_PASS = "PASS"
@@ -21,6 +21,8 @@ SCRIPT_4_GROUP_LENGTH = 48
 def test_full_write_and_read_compare_count(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)
+    inputs = script_runner._make_input_full_write_and_read_compare(SCRIPT_1_GROUP_SIZE)
+    driver.read.side_effect = list(inputs.values())
     script_runner.full_write_and_read_compare()
     assert driver.write.call_count == SCRIPT_1_CALL_COUNT
     assert driver.read.call_count == SCRIPT_1_CALL_COUNT
@@ -47,6 +49,7 @@ def test_full_write_and_read_compare_fail(mocker: MockerFixture):
 def test_partial_lba_write_count(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)
+    driver.read.side_effect = ["0x11112345"] * SCRIPT_2_LBA_SIZE * SCRIPT_2_LOOP_SIZE
     script_runner.partial_lba_write()
     assert driver.write.call_count == SCRIPT_2_LBA_SIZE * SCRIPT_2_LOOP_SIZE
     assert driver.read.call_count == SCRIPT_2_LBA_SIZE * SCRIPT_2_LOOP_SIZE
@@ -71,6 +74,11 @@ def test_partial_lba_write_fail(mocker: MockerFixture):
 def test_write_read_aging_count(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
     script_runner = ScriptRunner(driver)
+    input_values = []
+    for num_seed in script_runner.seeds:
+        random.seed(num_seed)
+        input_values.append(f"0x{random.randint(0, 0xFFFFFFFF):08X}")
+    driver.read.side_effect = [value for value in input_values for _ in range(SCRIPT_3_LBA_SIZE)]
     script_runner.write_read_aging()
     assert driver.write.call_count == SCRIPT_3_LBA_SIZE * SCRIPT_3_LOOP_SIZE
     assert driver.read.call_count == SCRIPT_3_LBA_SIZE * SCRIPT_3_LOOP_SIZE
@@ -83,7 +91,7 @@ def test_write_read_aging_pass(mocker: MockerFixture):
     for num_seed in script_runner.seeds:
         random.seed(num_seed)
         input_values.append(f"0x{random.randint(0, 0xFFFFFFFF):08X}")
-    driver.read.side_effect = [item for item in input_values for _ in range(SCRIPT_3_LBA_SIZE)]
+    driver.read.side_effect = [value for value in input_values for _ in range(SCRIPT_3_LBA_SIZE)]
     assert script_runner.write_read_aging() == SCRIPT_PASS
 
 
