@@ -56,3 +56,9 @@ def test_log_compression(logger_with_tempdir):
     files = os.listdir(log_dir)
     zip_files = [f for f in files if f.endswith(".zip")]
     assert len(zip_files) >= 1
+
+
+def test_singleton():
+    logger1 = Logger()
+    logger2 = Logger()
+    assert logger1 is logger2
