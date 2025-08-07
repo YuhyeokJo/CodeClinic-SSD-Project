@@ -29,7 +29,7 @@ def test_main_write_command(ssd_instance, mocker: MockerFixture):
     sys.argv = ['ssd.py', 'W', '10', '0xAAAABBBB']
     ssd.main()
 
-    mock_ssd.write.assert_called_once_with(10, '0xAAAABBBB')
+    mock_ssd.write.assert_called_once_with('10', '0xAAAABBBB')
     mock_ssd.read.assert_not_called()
 
 
@@ -39,7 +39,7 @@ def test_main_read_command(ssd_instance, mocker: MockerFixture):
     sys.argv = ['ssd.py', 'R', '10']
     ssd.main()
 
-    mock_ssd.read.assert_called_once_with(10)
+    mock_ssd.read.assert_called_once_with('10')
     mock_ssd.write.assert_not_called()
 
 
