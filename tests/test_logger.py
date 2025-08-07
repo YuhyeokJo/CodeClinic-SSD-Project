@@ -29,6 +29,14 @@ class TestLogger(unittest.TestCase):
             self.assertIn("포맷 테스트", content)
             self.assertRegex(content, r"\[\d{2}\.\d{2}\.\d{2} \d{2}:\d{2}\]")
 
+    def test_log_rotation(self):
+        # 로그 파일 회전 조건 만족시키기 위해 여러 줄 기록
+        for _ in range(200):
+            self.logger.print("TestLogger.test_log_rotation()", "많이 쓰기")
+
+        files = os.listdir(self.test_dir.name)
+        log_files = [f for f in files if f.endswith(".log")]
+        self.assertGreaterEqual(len(log_files), 2)
 
 if __name__ == "__main__":
     unittest.main()

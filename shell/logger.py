@@ -16,7 +16,15 @@ class Logger:
         return datetime.now().strftime("%y.%m.%d %H:%M")
 
     def _rotate_if_needed(self):
-        pass
+        if os.path.exists(self.log_file) and os.path.getsize(self.log_file) >= self.max_size:
+            ts = datetime.now().strftime("%y%m%d_%H%M")
+            new_path = os.path.join(self.log_dir, f"until_{ts}.log")
+
+            # 이미 같은 이름의 파일이 있다면 삭제하고 진행
+            if os.path.exists(new_path):
+                os.remove(new_path)
+
+            os.rename(self.log_file, new_path)
 
     def _compress_if_needed(self):
         pass
