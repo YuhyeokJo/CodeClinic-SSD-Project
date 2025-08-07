@@ -270,41 +270,42 @@ def test_write_and_erase_success(ssd_instance):
     assert actual == "1 0x12345678\n2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n"
 
 
-def test_erase_zero_size_success(ssd_instance):
-    ssd_instance.erase('0', '0')
+@pytest.mark.parametrize(
+    "lba", ['0', '10', '20', '30', '99']
+)
+def test_erase_zero_size_success(ssd_instance, lba):
+    ssd_instance.erase(lba, '0')
 
     with pytest.raises(FileNotFoundError):
         with open(ssd_instance.nand.path, "r") as f:
             f.read()
 
 
-def test_erase_max_clip_success(ssd_instance):
-    ssd_instance.erase('0', '-10')
+@pytest.mark.parametrize(
+    "lba, size, expected_output",
+    [
+        ('99', '10', "99 0x00000000\n"),
+        ('96', "10", "96 0x00000000\n97 0x00000000\n98 0x00000000\n99 0x00000000\n"),
+    ]
+)
+def test_erase_max_clip_success(ssd_instance, lba, size, expected_output):
+    ssd_instance.erase(lba, size)
 
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
-    assert actual == "0 0x00000000\n"
+    assert actual == expected_output
 
 
-def test_erase_max_clip_success2(ssd_instance):
-    ssd_instance.erase('1', '-10')
-
-    with open(ssd_instance.nand.path, "r") as f:
-        actual = f.read()
-    assert actual == "0 0x00000000\n1 0x00000000\n"
-
-
-def test_erase_min_clip_success1(ssd_instance):
-    ssd_instance.erase('99', '10')
-
-    with open(ssd_instance.nand.path, "r") as f:
-        actual = f.read()
-    assert actual == "99 0x00000000\n"
-
-
-def test_erase_min_clip_success2(ssd_instance):
-    ssd_instance.erase('97', '10')
+@pytest.mark.parametrize(
+    "lba, size, expected_output",
+    [
+        ('1', '-10', "0 0x00000000\n1 0x00000000\n"),
+        ('3', "-10", "0 0x00000000\n1 0x00000000\n2 0x00000000\n3 0x00000000\n"),
+    ]
+)
+def test_erase_min_clip_success2(ssd_instance, lba, size, expected_output):
+    ssd_instance.erase(lba, size)
 
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
-    assert actual == "97 0x00000000\n98 0x00000000\n99 0x00000000\n"
+    assert actual == expected_output
