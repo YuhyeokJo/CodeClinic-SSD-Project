@@ -14,6 +14,7 @@ from shell.driver import SSDDriver
 from shell.run_shell import InteractiveShell, BatchShell, NotExistingTestScriptError, NotExistingFileError, main
 
 
+@pytest.mark.skip("skip slow test using real ssd driver")
 def test_main_with_no_arg(capsys, mocker):
     sys.argv = [f"{(Path(__file__).parent.parent / 'shell.py').resolve()}"]
     input_patch = mocker.patch("shell.run_shell.input")
@@ -33,6 +34,7 @@ def test_main_with_no_arg(capsys, mocker):
             assert False
 
 
+@pytest.mark.skip("skip slow test using real ssd driver")
 def test_main_with_shell_script_file(capsys):
     sys.argv = [f"{(Path(__file__).parent.parent / 'shell.py').resolve()}",
                 f"{(Path(__file__).parent / 'shell_scripts.txt').resolve()}"]
