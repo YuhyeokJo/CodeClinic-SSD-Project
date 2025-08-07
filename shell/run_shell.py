@@ -113,11 +113,11 @@ class BatchShell:
 
     def run(self):
         for script in self._script_list:
-            print(f"{script.full_name}  ___  Run...", end="")
+            print(f"{script.full_name}  ___  Run...", end="", flush=True)
             if self._run_script(script):
-                print("Pass")
+                print("Pass", flush=True)
             else:
-                print("Fail")
+                print("Fail", flush=True)
 
     def _register_builtin_script(self):
         self._registered_script["1_"] = self._registered_script["1_FullWriteAndReadCompare"] \
@@ -141,6 +141,12 @@ def exist_file(file_name: str) -> str:
     return file_name
 
 
+def run_batch_shell(file_name: str):
+    shell = BatchShell(SSDDriver())
+    shell.script_collection_file_path = Path(file_name)
+    shell.run()
+
+
 def main():
     parser = argparse.ArgumentParser(description="Shell mode")
 
@@ -151,4 +157,4 @@ def main():
     if args.script_collection_file_name is None:
         run_interactive_shell()
     else:
-        raise NotImplementedError
+        run_batch_shell(args.script_collection_file_name)
