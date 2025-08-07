@@ -122,7 +122,7 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd_instance):
     # act
     ssd_instance.write(cmd.lba, cmd.value)
 
-    with open(ssd_instance.ssd_nand_file, "r") as f:
+    with open(ssd_instance.nand.path, "r") as f:
         lines = f.read()
 
     # assert
@@ -137,7 +137,7 @@ def test_write_when_ssd_nand_text_exists(ssd_instance):
     cmd2 = WriteCommand(cmd="W", lba='3', value='0xAAAABBBB')
     ssd_instance.write(cmd2.lba, cmd2.value)
 
-    with open(ssd_instance.ssd_nand_file, "r") as f:
+    with open(ssd_instance.nand.path, "r") as f:
         line1, line2 = f.readlines()
 
     # assert
@@ -151,7 +151,7 @@ def test_write_when_ssd_nand_text_exists_multiple(ssd_instance):
         expected += f"{lba} {value}\n"
         ssd_instance.write(str(lba), value)
 
-    with open(ssd_instance.ssd_nand_file, "r") as f:
+    with open(ssd_instance.nand.path, "r") as f:
         result = f.read()
 
     assert expected == result
@@ -166,7 +166,7 @@ def test_write_when_same_lba(ssd_instance):
     ssd_instance.write(cmd2.lba, cmd2.value)
 
     data = dict()
-    with open(ssd_instance.ssd_nand_file, "r") as f:
+    with open(ssd_instance.nand.path, "r") as f:
         for line in f:
             lba, val = line.rstrip().split(' ')
             data[str(lba)] = val
@@ -253,7 +253,7 @@ def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
 def test_erase_success(ssd_instance):
     ssd_instance.erase('2', '4')
 
-    with open(ssd_instance.ssd_nand_file, "r") as f:
+    with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
     assert actual != "2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n6 0x00000000\n"
@@ -264,7 +264,7 @@ def test_write_and_erase_success(ssd_instance):
     ssd_instance.write('2', '0x12345678')
     ssd_instance.erase('2', '4')
 
-    with open(ssd_instance.ssd_nand_file, "r") as f:
+    with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
     assert actual != "1 0x12345678\n2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n6 0x00000000\n"

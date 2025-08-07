@@ -15,12 +15,32 @@ class Validator:
         return size.isdigit() and 0 <= int(size) <= 10
 
 
+class NAND:
+    def __init__(self, output_dir):
+        self.path = output_dir / "ssd_nand.txt"
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def load(self) -> dict:
+        data = {}
+        if self.path.exists():
+            with open(self.path, "r") as f:
+                for line in f:
+                    lba, val = line.strip().split()
+                    data[lba] = val
+        return data
+
+    def save(self, data: dict) -> None:
+        with open(self.path, "w") as f:
+            for lba, val in data.items():
+                f.write(f"{lba} {val}\n")
+
+
 class SSD(Device):
     def __init__(self):
         self.output_dir = Path(__file__).resolve().parent.parent / "output"
         self.output_dir.mkdir(exist_ok=True)
-        self.ssd_nand_file = self.output_dir / "ssd_nand.txt"
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
+        self.nand = NAND(self.output_dir)
         self.validator = Validator()
 
     def write(self, lba: str, value: str) -> None:
@@ -28,16 +48,16 @@ class SSD(Device):
             self._write_output("ERROR")
             return
 
-        data = self._load_nand_data()
+        data = self.nand.load()
         data[lba] = value
-        self._save_nand_data(data)
+        self.nand.save(data)
 
     def read(self, lba: str) -> None:
         if not self.validator.is_valid_lba(lba):
             self._write_output("ERROR")
             return
 
-        data = self._load_nand_data()
+        data = self.nand.load()
         result = data.get(lba, INITIALIZED_DATA)
         with open(self.ssd_output_file, "w") as f:
             f.write(f"{lba} {result}\n")
@@ -51,28 +71,14 @@ class SSD(Device):
             self._write_output("ERROR")
             return
 
-        data = self._load_nand_data()
+        data = self.nand.load()
         for addr in range(int(lba), int(lba) + int(size), 1):
             data[str(addr)] = INITIALIZED_DATA
-        self._save_nand_data(data)
+        self.nand.save(data)
 
     def _write_output(self, content):
         with open(self.ssd_output_file, "w") as f:
             f.write(content)
-
-    def _load_nand_data(self) -> dict:
-        data = {}
-        if os.path.exists(self.ssd_nand_file):
-            with open(self.ssd_nand_file, "r") as f:
-                for line in f:
-                    lba, val = line.rstrip().split()
-                    data[lba] = val
-        return data
-
-    def _save_nand_data(self, data: dict) -> None:
-        with open(self.ssd_nand_file, "w") as f:
-            for lba, val in data.items():
-                f.write(f"{lba} {val}\n")
 
 
 def decimal_lba(lba: str):
