@@ -76,3 +76,18 @@ def test_same_lba_erase_command(capsys):
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
+
+
+def test_same_lba_more_range_erase_command(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "3")
+    cb.add_command("E", "1", "5")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_1_5\n"
+                            " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
