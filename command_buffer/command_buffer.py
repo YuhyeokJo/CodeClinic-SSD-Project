@@ -25,6 +25,9 @@ class CommandBuffer:
             empty_file = os.path.join(self.output_dir, f"{i}_empty")
             open(empty_file, "w").close()
 
+    def _initilize_empty_files(self):
+        pass
+
     def _get_slot_index(self):
         files = sorted(os.listdir(self.output_dir))
         for filename in files:
@@ -35,7 +38,6 @@ class CommandBuffer:
     def add_command(self, cmd_type, lba, value_or_size):
         slot = self._get_slot_index()
         if slot is None:
-            print("[Buffer Full] Flushing...")
             self.flush()
             slot = self._get_slot_index()
         filename = f"{slot}_{cmd_type}_{lba}_{value_or_size}"
@@ -46,9 +48,10 @@ class CommandBuffer:
         empty_path = os.path.join(self.output_dir, f"{slot}_empty")
         if os.path.exists(empty_path):
             os.remove(empty_path)
+        self.ignore_command_optimization()
 
     def flush(self):
-        pass
+        self._initialize_files()
 
     def parse_command(self, filename):
         pass
