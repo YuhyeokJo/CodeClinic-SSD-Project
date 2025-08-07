@@ -37,3 +37,10 @@ def test_erase_range_invalid_result_with_wrong_argument(mocker: MockerFixture, w
     erase_command = EraseRange(mocked_ssd)
     actual = erase_command.execute(wrong_argument)
     assert actual == INVALID_COMMAND
+
+
+def test_erase_range_correctly_with_ssd():
+    driver = SSDDriver()
+    erase_command = EraseRange(driver)
+    actual = erase_command.execute(["3", "10"])
+    assert actual == DONE
