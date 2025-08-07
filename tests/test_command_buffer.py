@@ -246,7 +246,7 @@ def test_merge_fails_on_size_limit(capsys):
                             " - 5_empty\n")
 
 
-def test_erase_merge_with_write_lba_optimization(capsys):
+def test_erase_merge_with_write_lba_optimization_1(capsys):
     cb = CommandBuffer()
     cb.add_command("E", "1", "10")
     cb.add_command("E", "7", "10")
@@ -258,5 +258,51 @@ def test_erase_merge_with_write_lba_optimization(capsys):
     assert captured.out == (" - 1_E_1_10\n"
                             " - 2_E_12_10\n"
                             " - 3_W_11_0x12345678\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_erase_merge_with_write_lba_optimization_2(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "10")
+    cb.add_command("E", "7", "10")
+    cb.add_command("E", "16", "6")
+    cb.add_command("W", "11", "0x12345678")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == (" - 1_E_1_10\n"
+                            " - 2_E_12_10\n"
+                            " - 3_W_11_0x12345678\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_write_outside_merged_erase_range_1(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "6")
+    cb.add_command("E", "6", "6")
+    cb.add_command("W", "1", "0x12345678")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == (" - 1_E_2_10\n"
+                            " - 2_W_1_0x12345678\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_write_outside_merged_erase_range_2(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "6")
+    cb.add_command("E", "6", "6")
+    cb.add_command("W", "11", "0x12345678")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == (" - 1_E_1_10\n"
+                            " - 2_W_11_0x12345678\n"
+                            " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
