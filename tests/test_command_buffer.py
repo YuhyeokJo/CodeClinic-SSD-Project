@@ -6,8 +6,7 @@ def test_add_one_command(capsys):
     cb.add_command("W", "1", "0x12121212")
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_1_0x12121212\n"
+    assert captured.out == (" - 1_W_1_0x12121212\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -21,8 +20,7 @@ def test_three_command(capsys):
     cb.add_command("W", "3", "0x12121212")
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_1_0x12121212\n"
+    assert captured.out == (" - 1_W_1_0x12121212\n"
                             " - 2_W_2_0x12121212\n"
                             " - 3_W_3_0x12121212\n"
                             " - 4_empty\n"
@@ -40,8 +38,7 @@ def test_more_five_command(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_6_0x12121212\n"
+    assert captured.out == (" - 1_W_6_0x12121212\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -55,8 +52,7 @@ def test_same_lba_write_command(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_1_0xAAAAAAAA\n"
+    assert captured.out == (" - 1_W_1_0xAAAAAAAA\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -70,8 +66,7 @@ def test_same_lba_erase_command(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_3\n"
+    assert captured.out == (" - 1_E_1_3\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -85,8 +80,7 @@ def test_same_lba_more_range_erase_command(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_5\n"
+    assert captured.out == (" - 1_E_1_5\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -100,8 +94,7 @@ def test_erase_when_write_within_valid_range(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_5\n"
+    assert captured.out == (" - 1_E_1_5\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -115,8 +108,7 @@ def test_erase_skipped_if_erase_invoked_before_valid_write(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_3_0x12345678\n"
+    assert captured.out == (" - 1_W_3_0x12345678\n"
                             " - 2_E_1_5\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -130,8 +122,7 @@ def test_merge_when_one_erase_contains_another(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_5\n"
+    assert captured.out == (" - 1_E_1_5\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -145,8 +136,7 @@ def test_merge_when_erases_are_adjacent(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_8\n"
+    assert captured.out == (" - 1_E_1_8\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -160,8 +150,7 @@ def test_merge_when_erases_overlap(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_7\n"
+    assert captured.out == (" - 1_E_1_7\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -175,9 +164,8 @@ def test_merge_rejected_when_resulting_erase_size_exceeds_ten(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_6\n"
-                            " - 2_E_5_7\n"
+    assert captured.out == (" - 1_E_1_10\n"
+                            " - 2_E_11_1\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
@@ -191,8 +179,7 @@ def test_pdf_page30(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_20_0xEEEEFFFF\n"
+    assert captured.out == (" - 1_W_20_0xEEEEFFFF\n"
                             " - 2_W_21_0x12341234\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -207,8 +194,7 @@ def test_pdf_page31(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_18_5\n"
+    assert captured.out == (" - 1_E_18_5\n"
                             " - 2_empty\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -223,8 +209,7 @@ def test_pdf_page32(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_W_20_0xABCDABCD\n"
+    assert captured.out == (" - 1_W_20_0xABCDABCD\n"
                             " - 2_E_10_5\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
@@ -239,9 +224,23 @@ def test_merge_erases_when_intermediate_erase_added(capsys):
 
     cb.show_status()
     captured = capsys.readouterr()
-    assert captured.out == ("=== Buffer 상태 ===\n"
-                            " - 1_E_1_7\n"
+    assert captured.out == (" - 1_E_1_7\n"
                             " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_merge_fails_on_size_limit(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "5")
+    cb.add_command("E", "12", "4")
+    cb.add_command("E", "5", "8")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == (" - 1_E_1_10\n"
+                            " - 2_E_11_5\n"
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")

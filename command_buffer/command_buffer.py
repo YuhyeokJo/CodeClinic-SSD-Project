@@ -122,23 +122,23 @@ class CommandBuffer:
                 if start <= last_end + 1:
                     new_start = min(start, last_start)
                     new_end = max(end, last_end)
-                    new_size = new_end - new_start + 1
-
-                    if new_size <= 10:
-                        new_slot = min(slot, last_slot)
-                        merged[-1] = (new_start, new_end, new_slot)
-                    else:
-                        merged.append((start, end, slot))  # 병합 안 함
+                    new_slot = min(slot, last_slot)
+                    merged[-1] = (new_start, new_end, new_slot)
                 else:
                     merged.append((start, end, slot))
 
         for start, end, slot in merged:
-            size = end - start + 1
-            fname = f"{slot}_E_{start}_{size}"
-            result.append((fname, slot, "E", start, str(size)))
+            curr = start
+            while curr <= end:
+                next_end = min(curr + 9, end)  # 최대 10칸
+                size = next_end - curr + 1
+                fname = f"{slot}_E_{curr}_{size}"
+                result.append((fname, slot, "E", curr, str(size)))
+                curr = next_end + 1
 
         final_cmds = result
 
+        # 6. 최종 파일 정리 및 저장
         for fname in files:
             if "empty" not in fname:
                 os.remove(os.path.join(self.output_dir, fname))
@@ -154,6 +154,5 @@ class CommandBuffer:
             open(os.path.join(self.output_dir, f"{i}_empty"), "w").close()
 
     def show_status(self):
-        print("=== Buffer 상태 ===")
         for f in sorted(os.listdir(self.output_dir)):
             print(f" - {f}")
