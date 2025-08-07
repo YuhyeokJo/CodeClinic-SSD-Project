@@ -44,3 +44,15 @@ def test_erase_correctly_with_ssd():
     erase_command = Erase(driver)
     actual = erase_command.execute(["3", "1"])
     assert actual == DONE
+
+def test_erase_correctly_with_ssd_neg_size():
+    driver = SSDDriver()
+    erase_command = Erase(driver)
+    actual = erase_command.execute(["3", "-2"])
+    assert actual == DONE
+
+def test_erase_correctly_with_ssd_zero_size():
+    driver = SSDDriver()
+    erase_command = Erase(driver)
+    actual = erase_command.execute(["3", "0"])
+    assert actual == DONE

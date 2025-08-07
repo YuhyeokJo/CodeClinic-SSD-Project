@@ -17,7 +17,7 @@ def is_valid_hex_data(data: str) -> bool:
 
 
 def is_valid_size(size: str) -> bool:
-    return int(size) in SIZE_RANGE and size.isdigit()
+    return -10 <= int(size) <= 10
 
 
 class ArgumentValidator(ABC):
@@ -74,5 +74,11 @@ class EraseRangeValidator(ArgumentValidator):
         lba_start, lba_end = args
         if not is_valid_lba(lba_start) or not lba_end.isdigit():
             return False
-        size = str(int(lba_end) - int(lba_start) + 1)
+        diff = int(lba_end) - int(lba_start)
+        if diff > 0:
+            size = str(diff + 1)
+        elif diff < 0:
+            size = str(diff - 1)
+        else:
+            size = 0
         return is_valid_size(size)
