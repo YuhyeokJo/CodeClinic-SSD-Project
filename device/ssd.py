@@ -1,6 +1,5 @@
 from pathlib import Path
 from device import Device
-import os
 import argparse
 import re
 
@@ -50,21 +49,20 @@ class NAND:
 
 
 class OutputWriter:
-    def __init__(self, path: Path):
-        self.path = path
+    def __init__(self, output_file: Path):
+        self.output_file = output_file
+        self.output_file.parent.mkdir(parents=True, exist_ok=True)
 
     def write(self, content: str):
-        with open(self.path, "w") as f:
+        with open(self.output_file, "w") as f:
             f.write(content)
 
 
 class SSD(Device):
-    def __init__(self, nand: NAND):
-        self.output_dir = OUTPUT_DIR
-        self.output_dir.mkdir(exist_ok=True)
-        self.ssd_output_file = self.output_dir / "ssd_output.txt"
+    def __init__(self, nand: NAND, output_writer: OutputWriter):
         self.nand = nand
         self.validator = Validator()
+        self.output_writer = output_writer
 
     def write(self, lba: str, value: str) -> None:
         if not self.validator.is_valid_lba(lba):
@@ -82,8 +80,7 @@ class SSD(Device):
 
         data = self.nand.load()
         result = data.get(lba, INITIALIZED_DATA)
-        with open(self.ssd_output_file, "w") as f:
-            f.write(f"{lba} {result}\n")
+        self._write_output(f"{lba} {result}\n")
 
     def erase(self, lba: str, size: str) -> None:
         if not self.validator.is_valid_lba(lba):
@@ -102,12 +99,12 @@ class SSD(Device):
 
         if size_int > 0:
             max_addr = lba_int + size_int - 1
-            if max_addr > MAX_SIZE:
+            if max_addr > MAX_LBA:
                 self._write_output(ERROR)
                 return
         else:
             min_addr = lba_int + size_int + 1
-            if min_addr < 0:
+            if min_addr < MIN_LBA:
                 self._write_output(ERROR)
                 return
 
@@ -122,10 +119,8 @@ class SSD(Device):
 
         self.nand.save(data)
 
-    def _write_output(self, content):
-        with open(self.ssd_output_file, "w") as f:
-            f.write(content)
-
+    def _write_output(self, content: str):
+        self.output_writer.write(content)
 
 def decimal_lba(lba: str):
     if not lba.isdigit():
@@ -172,7 +167,7 @@ def main():
     except SystemExit as e:
         exit(1)
 
-    ssd = SSD(nand=NAND(OUTPUT_DIR))
+    ssd = SSD(nand=NAND(OUTPUT_DIR), output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
     if args.command == "W":
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":
