@@ -14,6 +14,8 @@ LBA_RANGE = range(0, MAX_LBA + 1)
 MIN_SIZE = -10
 MAX_SIZE = 10
 
+OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
+
 
 class Validator:
     def is_valid_lba(self, lba: str) -> bool:
@@ -57,11 +59,11 @@ class OutputWriter:
 
 
 class SSD(Device):
-    def __init__(self):
-        self.output_dir = Path(__file__).resolve().parent.parent / "output"
+    def __init__(self, nand: NAND):
+        self.output_dir = OUTPUT_DIR
         self.output_dir.mkdir(exist_ok=True)
         self.ssd_output_file = self.output_dir / "ssd_output.txt"
-        self.nand = NAND(self.output_dir)
+        self.nand = nand
         self.validator = Validator()
 
     def write(self, lba: str, value: str) -> None:
@@ -170,7 +172,7 @@ def main():
     except SystemExit as e:
         exit(1)
 
-    ssd = SSD()
+    ssd = SSD(nand=NAND(OUTPUT_DIR))
     if args.command == "W":
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":
