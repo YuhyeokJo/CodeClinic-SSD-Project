@@ -1,4 +1,5 @@
 import random
+
 from shell.driver import SSDDriver
 from shell.commands.write import Write
 from shell.commands.read import Read
@@ -57,19 +58,16 @@ class ScriptRunner:
         return SCRIPT_PASS
 
     def write_read_aging(self) -> str:
-        values = []
+        results = []
         for num_seed in self.seeds:
             random.seed(num_seed)
             value = f"0x{random.randint(0, 0xFFFFFFFF):08X}"
-            values.append(value)
             res = self.write_command.execute(["0", value])
             if INVALID_COMMAND in res:
                 return INVALID_COMMAND
             res = self.write_command.execute(["99", value])
             if INVALID_COMMAND in res:
                 return INVALID_COMMAND
-        results = []
-        for value in values:
             results.append(self._read_compare(["0", value]))
             results.append(self._read_compare(["99", value]))
         if not all(results):
