@@ -24,6 +24,10 @@ class Logger:
 
         self._initialized = True
 
+    @classmethod
+    def _reset(cls):
+        cls._instance = None
+
     def _get_formatted_time(self):
         return datetime.now().strftime("%y.%m.%d %H:%M")
 

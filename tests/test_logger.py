@@ -9,9 +9,10 @@ from shell.logger import Logger
 @pytest.fixture
 def logger_with_tempdir():
     with tempfile.TemporaryDirectory() as tmpdir:
-        Logger._instance = None  # Singleton 리셋
+        Logger._reset()
         logger = Logger(log_dir=tmpdir, max_size_kb=0.01)
         yield logger, tmpdir
+        Logger._reset()
 
 
 def test_log_file_created(logger_with_tempdir):
