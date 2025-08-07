@@ -12,10 +12,10 @@ from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
 from shell.run_shell import InteractiveShell, BatchShell, NotExistingTestScriptError, NotExistingFileError, main
-from shell.run_shell import run_interactive_shell
 
 
-def test_interactive_shell_correct_input(capsys, mocker):
+def test_main_with_no_arg(capsys, mocker):
+    sys.argv = [f"{(Path(__file__).parent.parent / 'shell.py').resolve()}"]
     input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect = [
         "help write",
@@ -26,7 +26,7 @@ def test_interactive_shell_correct_input(capsys, mocker):
         "exit"
     ]
 
-    run_interactive_shell()
+    main()
 
     for output in capsys.readouterr().out.split("\n"):
         if output == "INVALID COMMAND":
