@@ -43,6 +43,7 @@ def test_main_with_shell_script_file(capsys):
         "1_FullWriteAndReadCompare  ___  Run...Pass",
         "2_PartialLBAWrite  ___  Run...Pass",
         "3_WriteReadAging  ___  Run...Pass",
+        "4_EraseAndWriteAging  ___  Run...Pass",
     ]
 
 

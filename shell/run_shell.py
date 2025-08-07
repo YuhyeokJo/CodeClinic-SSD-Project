@@ -113,7 +113,7 @@ class BatchShell:
 
     def _run_script(self, script: Script):
         result = script.command.execute([])
-        return result == "[SCRIPT] PASS"
+        return result == "PASS"
 
     def run(self):
         for script in self._script_list:
@@ -132,6 +132,9 @@ class BatchShell:
 
         self._registered_script["3_"] = self._registered_script["3_WriteReadAging"] \
             = BatchShell.Script("3_WriteReadAging", Script3(self._driver))
+
+        self._registered_script["4_"] = self._registered_script["4_EraseAndWriteAging"] \
+            = BatchShell.Script("4_EraseAndWriteAging", Script4(self._driver))
 
 
 def run_interactive_shell():
