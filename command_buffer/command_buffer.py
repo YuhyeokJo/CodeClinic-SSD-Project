@@ -54,10 +54,54 @@ class CommandBuffer:
         self._initialize_files()
 
     def parse_command(self, filename):
-        pass
+        parts = filename.split("_")
+        if len(parts) != 4:
+            return None
+        slot = int(parts[0])
+        cmd_type = parts[1]
+        lba = int(parts[2])
+        val_or_size = parts[3]
+        return (filename, slot, cmd_type, lba, val_or_size)
 
     def ignore_command_optimization(self):
-        pass
+        files = os.listdir(self.output_dir)
+        commands = []
+
+        # 1. 파일 이름에서 명령어 파싱
+        for fname in files:
+            if "empty" in fname:
+                continue
+            parsed = self.parse_command(fname)
+            if parsed:
+                commands.append(parsed)
+
+        # 2. Write 중복 제거 (가장 마지막 것만 남김)
+        latest_write = {}
+        latest_erase = {}
+        for cmd in commands:
+            fname, slot, cmd_type, lba, val = cmd
+            if cmd_type == "W":
+                latest_write[lba] = cmd
+            elif cmd_type == "E":
+                size = int(val)
+                if lba not in latest_erase or size > int(latest_erase[lba][4]):
+                    latest_erase[lba] = cmd
+
+        final_cmds = list(latest_write.values()) + list(latest_erase.values())
+
+        for fname in files:
+            if "empty" not in fname:
+                os.remove(os.path.join(self.output_dir, fname))
+
+            # 재저장: 1부터 차례대로
+        for idx, (_, _, cmd, lba, val) in enumerate(final_cmds, start=1):
+            new_fname = f"{idx}_{cmd}_{lba}_{val}"
+            with open(os.path.join(self.output_dir, new_fname), "w") as f:
+                f.write("")
+
+            # 남는 슬롯은 empty로 채우기
+        for i in range(len(final_cmds) + 1, 6):
+            open(os.path.join(self.output_dir, f"{i}_empty"), "w").close()
 
     def show_status(self):
         print("=== Buffer 상태 ===")
