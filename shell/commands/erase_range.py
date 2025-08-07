@@ -1,5 +1,6 @@
 from shell.command import Command
 from shell.command_validator import EraseRangeValidator
+from shell.commands.erase import Erase
 from shell.driver import SSDDriver
 
 LBA_START = 0
@@ -13,13 +14,14 @@ class EraseRange(Command):
     def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._validator = EraseRangeValidator()
+        self._erase = Erase(self._driver)
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
             return INVALID_COMMAND
         lba_start, lba_end = args
-        lba_end = LBA_END if int(lba_end) > LBA_END else lba_end
-        result = self._driver.erase_range(lba_start, lba_end)
+        size = str(int(lba_end) - int(lba_start) + 1)
+        result = self._erase.execute([lba_start, size])
         if not result:
             return INVALID_COMMAND
         return DONE
