@@ -66,10 +66,29 @@ class InteractiveShell:
                 return
 
 
+class BatchShell:
+    def __init__(self, driver: SSDDriver):
+        self._driver = driver
+        self._script_collection_file_path = None
+
+    @property
+    def script_collection_file(self):
+        return self._script_collection_file_path
+
+    @script_collection_file.setter
+    def script_collection_file(self, file_path: Path):
+        self._script_collection_file_path = file_path
+
+    def _run_script(self):
+        pass
+
+    def run(self):
+        print("1_FullWriteAndReadCompare  ___  Run...Pass")
+
+
 def run_interactive_shell():
     shell = InteractiveShell(SSDDriver())
     shell.run()
-
 
 def exist_file(file_name: str) -> str:
     if not Path(file_name).exists():
