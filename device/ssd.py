@@ -114,11 +114,12 @@ def decimal_lba(lba: str):
     return lba
 
 
-def decimal_size(size: str):
-    if not size.isdigit():
-        raise argparse.ArgumentTypeError(f"Size {size}는 10진수 숫자여야 합니다.")
-    return size
-
+def integer_size(size: str):
+    try:
+        int(size)
+        return size
+    except ValueError:
+        raise argparse.ArgumentTypeError("Size {size}는 숫자형태여야 합니다.")
 
 def hex_value(value: str):
     if not value.startswith("0x"):
@@ -144,7 +145,7 @@ def main():
 
     erase_parser = subparsers.add_parser("E", help="Erase")
     erase_parser.add_argument("lba", type=decimal_lba, help="LBA to Erase")
-    erase_parser.add_argument("size", type=decimal_lba, help="Value to write")
+    erase_parser.add_argument("size", type=integer_size, help="Value to write")
 
     try:
         args = parser.parse_args()
