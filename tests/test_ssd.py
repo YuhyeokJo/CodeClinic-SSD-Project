@@ -31,6 +31,7 @@ def test_main_write_command(ssd_instance, mocker: MockerFixture):
 
     mock_ssd.write.assert_called_once_with('10', '0xAAAABBBB')
     mock_ssd.read.assert_not_called()
+    mock_ssd.erase.assert_not_called()
 
 
 def test_main_read_command(ssd_instance, mocker: MockerFixture):
@@ -40,6 +41,18 @@ def test_main_read_command(ssd_instance, mocker: MockerFixture):
     ssd.main()
 
     mock_ssd.read.assert_called_once_with('10')
+    mock_ssd.write.assert_not_called()
+    mock_ssd.erase.assert_not_called()
+
+
+def test_main_erase_command(ssd_instance, mocker: MockerFixture):
+    mock_ssd = mocker.Mock(spec=SSD)
+    mocker.patch('device.ssd.SSD', return_value=mock_ssd)
+    sys.argv = ['ssd.py', 'E', '10', '5']
+    ssd.main()
+
+    mock_ssd.erase.assert_called_once_with('10', '5')
+    mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
 
 
@@ -227,3 +240,31 @@ def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance)
         actual = f.read()
 
     assert actual == "ERROR"
+
+
+def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
+    ssd_instance.erase('0', "11")
+    with open(ssd_instance.ssd_output_file, "r") as f:
+        actual = f.read()
+
+    assert actual == "ERROR"
+
+
+def test_erase_success(ssd_instance):
+    ssd_instance.erase('2', '4')
+
+    with open(ssd_instance.ssd_nand_file, "r") as f:
+        actual = f.read()
+
+    assert actual != "2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n6 0x00000000\n"
+
+
+def test_write_and_erase_success(ssd_instance):
+    ssd_instance.write('1', '0x12345678')
+    ssd_instance.write('2', '0x12345678')
+    ssd_instance.erase('2', '4')
+
+    with open(ssd_instance.ssd_nand_file, "r") as f:
+        actual = f.read()
+
+    assert actual != "1 0x12345678\n2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n6 0x00000000\n"

@@ -33,6 +33,21 @@ class SSD(Device):
         with open(self.ssd_output_file, "w") as f:
             f.write(f"{lba} {result}\n")
 
+    def erase(self, lba: str, size: str) -> None:
+        if int(lba) < 0 or 99 < int(lba):
+            self._write_output("ERROR")
+            return
+
+        size_int = int(size)
+        if size_int < 0 or 10 < size_int:
+            self._write_output("ERROR")
+            return
+
+        data = self._load_nand_data()
+        for addr in range(int(lba), int(lba) + size_int, 1):
+            data[str(addr)] = INITIALIZED_DATA
+        self._save_nand_data(data)
+
     def _write_output(self, content):
         with open(self.ssd_output_file, "w") as f:
             f.write(content)
@@ -58,6 +73,12 @@ def decimal_lba(lba: str):
     return lba
 
 
+def decimal_size(size: str):
+    if not size.isdigit():
+        raise argparse.ArgumentTypeError(f"Size {size}는 10진수 숫자여야 합니다.")
+    return size
+
+
 def hex_value(value: str):
     if not value.startswith("0x"):
         raise argparse.ArgumentTypeError(f"Value {value}는 '0x'로 시작해야 합니다.")
@@ -80,6 +101,10 @@ def main():
     read_parser = subparsers.add_parser("R", help="Read")
     read_parser.add_argument("lba", type=decimal_lba, help="LBA to read from")
 
+    erase_parser = subparsers.add_parser("E", help="Erase")
+    erase_parser.add_argument("lba", type=decimal_lba, help="LBA to Erase")
+    erase_parser.add_argument("size", type=decimal_lba, help="Value to write")
+
     try:
         args = parser.parse_args()
     except SystemExit as e:
@@ -90,6 +115,8 @@ def main():
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":
         ssd.read(str(args.lba))
+    elif args.command == "E":
+        ssd.erase(str(args.lba), args.size)
 
 
 if __name__ == "__main__":
