@@ -97,7 +97,7 @@ class BatchShell:
         if not file_path.exists():
             raise NotExistingFileError(f"{file_path} does not exist")
 
-        with self._script_collection_file_path.open("r") as f:
+        with file_path.open("r") as f:
             for line in f.readlines():
                 line = line.strip("\n")
                 if line in self._registered_script:
@@ -122,6 +122,12 @@ class BatchShell:
     def _register_builtin_script(self):
         self._registered_script["1_"] = self._registered_script["1_FullWriteAndReadCompare"] \
             = BatchShell.Script("1_FullWriteAndReadCompare", Script1(self._driver))
+
+        self._registered_script["2_"] = self._registered_script["2_PartialLBAWrite"] \
+            = BatchShell.Script("2_PartialLBAWrite", Script2(self._driver))
+
+        self._registered_script["3_"] = self._registered_script["3_WriteReadAging"] \
+            = BatchShell.Script("3_WriteReadAging", Script3(self._driver))
 
 
 def run_interactive_shell():

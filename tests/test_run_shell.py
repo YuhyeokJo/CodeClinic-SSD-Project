@@ -150,7 +150,6 @@ def test_read_command_correctly_until_exit(capsys, mocked_driver_shell_input):
     last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-2]
     assert last_shell_line == "[Read] LBA 3: 0x00000003"
 
-
 def test_mocked_batch_shell_with_correct_file_and_success_script(tmp_path, capsys, mocker: MockerFixture):
     # Arrange
     patch_bash_shell__run_script = mocker.patch("shell.run_shell.BatchShell._run_script")
@@ -197,6 +196,43 @@ def test_mocked_batch_shell_with_correct_file_and_fail_script(tmp_path, capsys, 
     # Assert
     actual = capsys.readouterr().out.strip("\n")
     assert actual == "1_FullWriteAndReadCompare  ___  Run...Fail"
+
+
+def test_mocked_batch_shell_with_correct_file_and_multiple_script(tmp_path, capsys, mocker: MockerFixture):
+    # Arrange
+    patch_bash_shell__run_script = mocker.patch("shell.run_shell.BatchShell._run_script")
+    patch_bash_shell__run_script.side_effect = [
+        True, True,
+        False, False,
+        True, True,
+    ]
+
+    batch_shell = BatchShell(mocker.Mock(spec=SSDDriver))
+
+    script_collection_file = tmp_path / "shell_scripts.txt"
+    script_collection_file.touch()
+    with script_collection_file.open("w") as f:
+        for script_name in [
+            "1_", "1_FullWriteAndReadCompare",
+            "2_", "2_PartialLBAWrite",
+            "3_", "3_WriteReadAging"
+        ]:
+            f.writelines(script_name + "\n")
+    batch_shell.script_collection_file_path = script_collection_file
+
+    # Act
+    batch_shell.run()
+
+    # Assert
+    actual = capsys.readouterr().out.strip("\n").split("\n")
+    assert actual == [
+        "1_FullWriteAndReadCompare  ___  Run...Pass",
+        "1_FullWriteAndReadCompare  ___  Run...Pass",
+        "2_PartialLBAWrite  ___  Run...Fail",
+        "2_PartialLBAWrite  ___  Run...Fail",
+        "3_WriteReadAging  ___  Run...Pass",
+        "3_WriteReadAging  ___  Run...Pass",
+    ]
 
 
 def test_mocked_batch_shell_with_wrong_file_that_contain_not_existing_test(tmp_path, capsys, mocker: MockerFixture):
