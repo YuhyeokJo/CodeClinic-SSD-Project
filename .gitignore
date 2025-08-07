@@ -2,3 +2,4 @@
 .idea
 output
 logs
+tests/logs
