@@ -78,31 +78,30 @@ class SSD(Device):
         if int(size) == 0:
             return
 
-        clamped_size = self._clamp_erase_size(int(lba), int(size))
+        lba_int = int(lba)
+        size_int = int(size)
+
+        if size_int > 0:
+            max_addr = lba_int + size_int - 1
+            if max_addr > 99:
+                self._write_output("ERROR")
+                return
+        else:
+            min_addr = lba_int + size_int + 1
+            if min_addr < 0:
+                self._write_output("ERROR")
+                return
 
         data = self.nand.load()
 
-        if clamped_size > 0:
-            for addr in range(int(lba), int(lba) + clamped_size, 1):
+        if size_int > 0:
+            for addr in range(lba_int, lba_int + size_int, 1):
                 data[str(addr)] = INITIALIZED_DATA
         else:
-            for addr in range(int(lba) + clamped_size, int(lba) + 1, 1):
+            for addr in range(lba_int + size_int + 1, lba_int + 1, 1):
                 data[str(addr)] = INITIALIZED_DATA
 
         self.nand.save(data)
-
-    def _clamp_erase_size(self, lba: int, size: int) -> int:
-        if size > 0:
-            max_addr = lba + size - 1
-            if max_addr > 99:
-                return 99 - lba + 1
-            return size
-        elif size < 0:
-            min_addr = lba + size
-            if min_addr < 0:
-                return -lba
-            return size
-        return 0
 
     def _write_output(self, content):
         with open(self.ssd_output_file, "w") as f:

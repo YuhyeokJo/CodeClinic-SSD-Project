@@ -250,6 +250,22 @@ def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
     assert actual == "ERROR"
 
 
+@pytest.mark.parametrize(
+    "lba, size",
+    [
+        ('91', '10'),
+        ('96', '10'),
+        ('0', '-2'),
+    ]
+)
+def test_erase_error_wrong_ssd_output_txt_if_lba_size_exceed_99_or_under_0(ssd_instance, lba, size):
+    ssd_instance.erase(lba, size)
+
+    with open(ssd_instance.ssd_output_file, "r") as f:
+        actual = f.read()
+    assert actual == "ERROR"
+
+
 def test_erase_success(ssd_instance):
     ssd_instance.erase('2', '4')
 
@@ -257,6 +273,14 @@ def test_erase_success(ssd_instance):
         actual = f.read()
 
     assert actual == "2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n"
+
+def test_erase_success2(ssd_instance):
+    ssd_instance.erase('0', '-1')
+
+    with open(ssd_instance.nand.path, "r") as f:
+        actual = f.read()
+
+    assert actual == "0 0x00000000\n"
 
 
 def test_write_and_erase_success(ssd_instance):
@@ -279,33 +303,3 @@ def test_erase_zero_size_success(ssd_instance, lba):
     with pytest.raises(FileNotFoundError):
         with open(ssd_instance.nand.path, "r") as f:
             f.read()
-
-
-@pytest.mark.parametrize(
-    "lba, size, expected_output",
-    [
-        ('99', '10', "99 0x00000000\n"),
-        ('96', "10", "96 0x00000000\n97 0x00000000\n98 0x00000000\n99 0x00000000\n"),
-    ]
-)
-def test_erase_max_clip_success(ssd_instance, lba, size, expected_output):
-    ssd_instance.erase(lba, size)
-
-    with open(ssd_instance.nand.path, "r") as f:
-        actual = f.read()
-    assert actual == expected_output
-
-
-@pytest.mark.parametrize(
-    "lba, size, expected_output",
-    [
-        ('1', '-10', "0 0x00000000\n1 0x00000000\n"),
-        ('3', "-10", "0 0x00000000\n1 0x00000000\n2 0x00000000\n3 0x00000000\n"),
-    ]
-)
-def test_erase_min_clip_success2(ssd_instance, lba, size, expected_output):
-    ssd_instance.erase(lba, size)
-
-    with open(ssd_instance.nand.path, "r") as f:
-        actual = f.read()
-    assert actual == expected_output
