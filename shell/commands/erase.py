@@ -3,7 +3,7 @@ from shell.command_validator import EraseValidator
 from shell.driver import SSDDriver
 
 LBA_START = 0
-LBA_END = 100
+LBA_END = 99
 
 DONE = "[Erase] Done"
 INVALID_COMMAND = "INVALID COMMAND"
@@ -18,7 +18,7 @@ class Erase(Command):
         if not self._validator.validate(args):
             return INVALID_COMMAND
         lba, size = args
-
+        size = LBA_END if int(size) > LBA_END else size
         result = self._driver.erase(lba, size)
         if not result:
             return INVALID_COMMAND
