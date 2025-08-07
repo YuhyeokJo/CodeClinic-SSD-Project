@@ -66,14 +66,18 @@ class InteractiveShell:
             if isinstance(command, Exit):
                 return
 
+
 class BatchShellError(Exception):
     """Base error"""
+
 
 class NotExistingTestScriptError(BatchShellError):
     """Not existing scripts"""
 
+
 class NotExistingFileError(BatchShellError):
     """Not existing scripts"""
+
 
 class BatchShell:
     @dataclass

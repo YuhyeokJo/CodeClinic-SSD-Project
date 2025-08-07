@@ -52,8 +52,8 @@ def test_interactive_shell_using_script(capsys, mocker, script_id):
 
 
 def test_main_with_shell_script_file(capsys):
-
-    sys.argv = [f"{(Path(__file__).parent.parent / 'shell.py').resolve()}", f"{(Path(__file__).parent / 'shell_scripts.txt').resolve()}"]
+    sys.argv = [f"{(Path(__file__).parent.parent / 'shell.py').resolve()}",
+                f"{(Path(__file__).parent / 'shell_scripts.txt').resolve()}"]
 
     main()
 
@@ -62,6 +62,7 @@ def test_main_with_shell_script_file(capsys):
         "2_PartialLBAWrite  ___  Run...Pass",
         "3_WriteReadAging  ___  Run...Pass",
     ]
+
 
 """
 Tests using moced ssd driver
@@ -144,6 +145,7 @@ def test_read_command_correctly_until_exit(capsys, mocked_driver_shell_input):
     # Assert
     last_shell_line = capsys.readouterr().out.strip("\n").split("\n")[-2]
     assert last_shell_line == "[Read] LBA 3: 0x00000003"
+
 
 def test_mocked_batch_shell_with_correct_file_and_success_script(tmp_path, capsys, mocker: MockerFixture):
     # Arrange
