@@ -55,7 +55,7 @@ class SSD(Device):
 def decimal_lba(lba: str):
     if not lba.isdigit():
         raise argparse.ArgumentTypeError(f"LBA {lba}는 10진수 숫자여야 합니다.")
-    return int(lba)
+    return lba
 
 
 def hex_value(value: str):
@@ -87,9 +87,9 @@ def main():
 
     ssd = SSD()
     if args.command == "W":
-        ssd.write(args.lba, args.value)
+        ssd.write(str(args.lba), args.value)
     elif args.command == "R":
-        ssd.read(args.lba)
+        ssd.read(str(args.lba))
 
 
 if __name__ == "__main__":
