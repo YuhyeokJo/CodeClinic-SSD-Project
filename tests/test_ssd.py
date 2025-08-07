@@ -256,7 +256,7 @@ def test_erase_success(ssd_instance):
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
-    assert actual != "2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n6 0x00000000\n"
+    assert actual == "2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n"
 
 
 def test_write_and_erase_success(ssd_instance):
@@ -267,4 +267,44 @@ def test_write_and_erase_success(ssd_instance):
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
-    assert actual != "1 0x12345678\n2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n6 0x00000000\n"
+    assert actual == "1 0x12345678\n2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n"
+
+
+def test_erase_zero_size_success(ssd_instance):
+    ssd_instance.erase('0', '0')
+
+    with pytest.raises(FileNotFoundError):
+        with open(ssd_instance.nand.path, "r") as f:
+            f.read()
+
+
+def test_erase_max_clip_success(ssd_instance):
+    ssd_instance.erase('0', '-10')
+
+    with open(ssd_instance.nand.path, "r") as f:
+        actual = f.read()
+    assert actual == "0 0x00000000\n"
+
+
+def test_erase_max_clip_success2(ssd_instance):
+    ssd_instance.erase('1', '-10')
+
+    with open(ssd_instance.nand.path, "r") as f:
+        actual = f.read()
+    assert actual == "0 0x00000000\n1 0x00000000\n"
+
+
+def test_erase_min_clip_success1(ssd_instance):
+    ssd_instance.erase('99', '10')
+
+    with open(ssd_instance.nand.path, "r") as f:
+        actual = f.read()
+    assert actual == "99 0x00000000\n"
+
+
+def test_erase_min_clip_success2(ssd_instance):
+    ssd_instance.erase('97', '10')
+
+    with open(ssd_instance.nand.path, "r") as f:
+        actual = f.read()
+    assert actual == "97 0x00000000\n98 0x00000000\n99 0x00000000\n"

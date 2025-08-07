@@ -12,7 +12,11 @@ class Validator:
         return lba.isdigit() and 0 <= int(lba) <= 99
 
     def is_valid_erase_size(self, size: str) -> bool:
-        return size.isdigit() and 0 <= int(size) <= 10
+        try:
+            value = int(size)
+            return -10 <= value <= 10
+        except ValueError:
+            return False
 
 
 class NAND:
@@ -71,9 +75,30 @@ class SSD(Device):
             self._write_output("ERROR")
             return
 
+        if int(size) == 0:
+            return
+
+        lba_int = int(lba)
+        size_int = int(size)
+        if size_int > 0:
+            max_addr = lba_int + size_int - 1
+            if max_addr > 99:
+                size_int = 99 - lba_int + 1
+        elif size_int < 0:
+            min_addr = lba_int + size_int
+            if min_addr < 0:
+                size_int = -lba_int
+
+        size = str(size_int)
         data = self.nand.load()
-        for addr in range(int(lba), int(lba) + int(size), 1):
-            data[str(addr)] = INITIALIZED_DATA
+        # forward erase
+        if int(size) > 0:
+            for addr in range(int(lba), int(lba) + int(size), 1):
+                data[str(addr)] = INITIALIZED_DATA
+        else:
+            for addr in range(int(lba) + int(size), int(lba) + 1, 1):
+                data[str(addr)] = INITIALIZED_DATA
+
         self.nand.save(data)
 
     def _write_output(self, content):
