@@ -4,17 +4,25 @@ import os
 import argparse
 import re
 
+ERROR = "ERROR"
+
 INITIALIZED_DATA = "0x00000000"
+MAX_LBA = 99
+MIN_LBA = 0
+LBA_RANGE = range(0, MAX_LBA + 1)
+
+MIN_SIZE = -10
+MAX_SIZE = 10
 
 
 class Validator:
     def is_valid_lba(self, lba: str) -> bool:
-        return lba.isdigit() and 0 <= int(lba) <= 99
+        return lba.isdigit() and MIN_LBA <= int(lba) <= MAX_LBA
 
     def is_valid_erase_size(self, size: str) -> bool:
         try:
             value = int(size)
-            return -10 <= value <= 10
+            return MIN_SIZE <= value <= MAX_SIZE
         except ValueError:
             return False
 
@@ -39,6 +47,15 @@ class NAND:
                 f.write(f"{lba} {val}\n")
 
 
+class OutputWriter:
+    def __init__(self, path: Path):
+        self.path = path
+
+    def write(self, content: str):
+        with open(self.path, "w") as f:
+            f.write(content)
+
+
 class SSD(Device):
     def __init__(self):
         self.output_dir = Path(__file__).resolve().parent.parent / "output"
@@ -49,7 +66,7 @@ class SSD(Device):
 
     def write(self, lba: str, value: str) -> None:
         if not self.validator.is_valid_lba(lba):
-            self._write_output("ERROR")
+            self._write_output(ERROR)
             return
 
         data = self.nand.load()
@@ -58,7 +75,7 @@ class SSD(Device):
 
     def read(self, lba: str) -> None:
         if not self.validator.is_valid_lba(lba):
-            self._write_output("ERROR")
+            self._write_output(ERROR)
             return
 
         data = self.nand.load()
@@ -68,11 +85,11 @@ class SSD(Device):
 
     def erase(self, lba: str, size: str) -> None:
         if not self.validator.is_valid_lba(lba):
-            self._write_output("ERROR")
+            self._write_output(ERROR)
             return
 
         if not self.validator.is_valid_erase_size(size):
-            self._write_output("ERROR")
+            self._write_output(ERROR)
             return
 
         if int(size) == 0:
@@ -83,13 +100,13 @@ class SSD(Device):
 
         if size_int > 0:
             max_addr = lba_int + size_int - 1
-            if max_addr > 99:
-                self._write_output("ERROR")
+            if max_addr > MAX_SIZE:
+                self._write_output(ERROR)
                 return
         else:
             min_addr = lba_int + size_int + 1
             if min_addr < 0:
-                self._write_output("ERROR")
+                self._write_output(ERROR)
                 return
 
         data = self.nand.load()
@@ -120,6 +137,7 @@ def integer_size(size: str):
         return size
     except ValueError:
         raise argparse.ArgumentTypeError("Size {size}는 숫자형태여야 합니다.")
+
 
 def hex_value(value: str):
     if not value.startswith("0x"):

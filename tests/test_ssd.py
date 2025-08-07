@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pytest_mock import MockerFixture
 
 from device import ssd
-from device.ssd import SSD
+from device.ssd import SSD, INITIALIZED_DATA, ERROR
 
 
 @dataclass
@@ -186,7 +186,7 @@ def test_read_init_value_should_be_0x00000000(ssd_instance):
             lba, val = line.rstrip().split(' ')
             data[lba] = val
 
-    assert data["0"] == "0x00000000"
+    assert data["0"] == INITIALIZED_DATA
 
 
 def test_read_creates_ssd_output_text_and_read_value(ssd_instance):
@@ -222,24 +222,24 @@ def test_read_origin_ssd_output_should_be_gone(ssd_instance):
 
 def test_read_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance):
     """
-    잘못된 LBA 범위가 입력되면ssd_output.txt에 "ERROR"가 기록된다.
+    잘못된 LBA 범위가 입력되면ssd_output.txt에 ERROR가 기록된다.
     """
     ssd_instance.read('-1')
     with open(ssd_instance.ssd_output_file, "r") as f:
         actual = f.read()
 
-    assert actual == "ERROR"
+    assert actual == ERROR
 
 
 def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance):
     """
-     • 잘못된LBA 범위가입력되면ssd_output.txt에 "ERROR"가 기록된다.
+     • 잘못된LBA 범위가입력되면ssd_output.txt에 ERROR가 기록된다.
     """
     ssd_instance.write('-1', "0xFFFFFFFF")
     with open(ssd_instance.ssd_output_file, "r") as f:
         actual = f.read()
 
-    assert actual == "ERROR"
+    assert actual == ERROR
 
 
 def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
@@ -247,7 +247,7 @@ def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
     with open(ssd_instance.ssd_output_file, "r") as f:
         actual = f.read()
 
-    assert actual == "ERROR"
+    assert actual == ERROR
 
 
 @pytest.mark.parametrize(
@@ -263,7 +263,7 @@ def test_erase_error_wrong_ssd_output_txt_if_lba_size_exceed_99_or_under_0(ssd_i
 
     with open(ssd_instance.ssd_output_file, "r") as f:
         actual = f.read()
-    assert actual == "ERROR"
+    assert actual == ERROR
 
 
 def test_erase_success(ssd_instance):
@@ -272,7 +272,7 @@ def test_erase_success(ssd_instance):
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
-    assert actual == "2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n"
+    assert actual == f"2 {INITIALIZED_DATA}\n3 {INITIALIZED_DATA}\n4 {INITIALIZED_DATA}\n5 {INITIALIZED_DATA}\n"
 
 def test_erase_success2(ssd_instance):
     ssd_instance.erase('0', '-1')
@@ -280,7 +280,7 @@ def test_erase_success2(ssd_instance):
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
-    assert actual == "0 0x00000000\n"
+    assert actual == f"0 {INITIALIZED_DATA}\n"
 
 
 def test_write_and_erase_success(ssd_instance):
@@ -291,7 +291,7 @@ def test_write_and_erase_success(ssd_instance):
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
 
-    assert actual == "1 0x12345678\n2 0x00000000\n3 0x00000000\n4 0x00000000\n5 0x00000000\n"
+    assert actual == f"1 0x12345678\n2 {INITIALIZED_DATA}\n3 {INITIALIZED_DATA}\n4 {INITIALIZED_DATA}\n5 {INITIALIZED_DATA}\n"
 
 
 @pytest.mark.parametrize(
