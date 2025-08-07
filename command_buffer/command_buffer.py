@@ -88,6 +88,7 @@ class CommandBuffer:
                     latest_erase[lba] = cmd
 
         result = []
+        # 3. erase 변위에 write가 선행되어 있으면 제거
         for lba, w_cmd in latest_write.items():
             _, write_slot, _, lba, _ = w_cmd
             lba = int(lba)
@@ -101,13 +102,46 @@ class CommandBuffer:
             if not erased:
                 result.append(w_cmd)
 
-        final_cmds = result + list(latest_erase.values())
+        erase_merged = []
+        for cmd in latest_erase.values():
+            _, slot, command, lba, size = cmd
+            lba = int(lba)
+            size = int(size)
+            start1 = lba
+            end1 = lba + size - 1
+
+            merged_flag = False
+
+            for i in range(len(erase_merged)):
+                _, _, _, mlba, msize = erase_merged[i]
+                mlba = int(mlba)
+                msize = int(msize)
+                start2 = mlba
+                end2 = mlba + msize - 1
+
+                # 겹치거나 인접한 경우 병합
+                if max(start1, start2) <= min(end1, end2) + 1:
+                    new_start = min(start1, start2)
+                    new_end = max(end1, end2)
+                    new_size = new_end - new_start + 1
+
+                    if new_size <= 10:
+                        # 병합 → 기존 항목 교체
+                        new_fname = f"{slot}_E_{new_start}_{new_size}"
+                        erase_merged[i] = (new_fname, slot, "E", new_start, str(new_size))
+                        merged_flag = True
+                        break
+
+            if not merged_flag:
+                erase_merged.append(cmd)
+
+        final_cmds = result + erase_merged
 
         for fname in files:
             if "empty" not in fname:
                 os.remove(os.path.join(self.output_dir, fname))
 
-            # 재저장: 1부터 차례대로
+        # 재저장: 1부터 차례대로
         for idx, (_, _, cmd, lba, val) in enumerate(final_cmds, start=1):
             new_fname = f"{idx}_{cmd}_{lba}_{val}"
             with open(os.path.join(self.output_dir, new_fname), "w") as f:

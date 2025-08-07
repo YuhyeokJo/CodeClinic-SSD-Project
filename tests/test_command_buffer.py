@@ -121,3 +121,48 @@ def test_erase_skipped_if_erase_invoked_before_valid_write(capsys):
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
+
+
+def test_merge_when_one_erase_contains_another(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "3", "3")
+    cb.add_command("E", "1", "5")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_1_5\n"
+                            " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_merge_when_erases_are_adjacent(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "3")
+    cb.add_command("E", "4", "5")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_1_8\n"
+                            " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
+
+
+def test_merge_when_erases_overlap(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "5")
+    cb.add_command("E", "3", "5")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_1_7\n"
+                            " - 2_empty\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
