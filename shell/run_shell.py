@@ -7,7 +7,7 @@ from shell.commands.erase import Erase
 from shell.commands.erase_range import EraseRange
 from shell.commands.help import Help
 from shell.commands.exit import Exit
-from shell.commands.script import Script1, Script2, Script3
+from shell.commands.script import Script1, Script2, Script3, Script4
 from shell.driver import SSDDriver
 from shell.logger import Logger
 
@@ -34,6 +34,7 @@ class TestShell:
         self._commands["1_"] = self._commands["1_FullWriteAndReadCompare"] = Script1(self._driver)
         self._commands["2_"] = self._commands["2_PartialLBAWrite"] = Script2(self._driver)
         self._commands["3_"] = self._commands["3_WriteReadAging"] = Script3(self._driver)
+        self._commands["4_"] = self._commands["4_EraseAndWriteAging"] = Script4(self._driver)
 
     def run(self):
         while True:
