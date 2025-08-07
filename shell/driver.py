@@ -35,7 +35,7 @@ class SSDDriver:
     def erase_range(self, start_lba: str, end_lba: str):
         size = int(end_lba) - int(start_lba) + 1
         subprocess.run(
-            f"python {Path(__file__).parent.parent / 'device/ssd.py'} {start_lba} {str(size)}",
+            f"python {Path(__file__).parent.parent / 'device/ssd.py'} E {start_lba} {str(size)}",
             shell=True
         )
 
