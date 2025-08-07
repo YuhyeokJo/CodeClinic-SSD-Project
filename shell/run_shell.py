@@ -66,6 +66,14 @@ class InteractiveShell:
             if isinstance(command, Exit):
                 return
 
+class BatchShellError(Exception):
+    """Base error"""
+
+class NotExistingTestScriptError(BatchShellError):
+    """Not existing scripts"""
+
+class NotExistingFileError(BatchShellError):
+    """Not existing scripts"""
 
 class BatchShell:
     @dataclass
@@ -86,12 +94,18 @@ class BatchShell:
 
     @script_collection_file_path.setter
     def script_collection_file_path(self, file_path: Path):
-        self._script_collection_file_path = file_path
+        if not file_path.exists():
+            raise NotExistingFileError(f"{file_path} does not exist")
+
         with self._script_collection_file_path.open("r") as f:
             for line in f.readlines():
                 line = line.strip("\n")
                 if line in self._registered_script:
                     self._script_list.append(self._registered_script[line])
+                else:
+                    raise NotExistingTestScriptError(f"{line} is not registered test script")
+
+        self._script_collection_file_path = file_path
 
     def _run_script(self, script: Script):
         result = script.command.execute([])

@@ -8,7 +8,7 @@ from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
-from shell.run_shell import InteractiveShell, BatchShell
+from shell.run_shell import InteractiveShell, BatchShell, NotExistingTestScriptError, NotExistingFileError
 from shell.run_shell import run_interactive_shell
 
 
@@ -173,3 +173,59 @@ def test_mocked_batch_shell_with_correct_file_and_success_script(tmp_path, capsy
     # Assert
     actual = capsys.readouterr().out.strip("\n")
     assert actual == "1_FullWriteAndReadCompare  ___  Run...Pass"
+
+
+def test_mocked_batch_shell_with_correct_file_and_fail_script(tmp_path, capsys, mocker: MockerFixture):
+    # Arrange
+    patch_bash_shell__run_script = mocker.patch("shell.run_shell.BatchShell._run_script")
+    patch_bash_shell__run_script.return_value = False
+
+    batch_shell = BatchShell(mocker.Mock(spec=SSDDriver))
+
+    script_collection_file = tmp_path / "shell_scripts.txt"
+    script_collection_file.touch()
+    with script_collection_file.open("w") as f:
+        for script_name in [
+            "1_"
+        ]:
+            f.writelines(script_name)
+    batch_shell.script_collection_file_path = script_collection_file
+
+    # Act
+    batch_shell.run()
+
+    # Assert
+    actual = capsys.readouterr().out.strip("\n")
+    assert actual == "1_FullWriteAndReadCompare  ___  Run...Fail"
+
+
+def test_mocked_batch_shell_with_wrong_file_that_contain_not_existing_test(tmp_path, capsys, mocker: MockerFixture):
+    # Arrange
+    patch_bash_shell__run_script = mocker.patch("shell.run_shell.BatchShell._run_script")
+    patch_bash_shell__run_script.return_value = False
+
+    batch_shell = BatchShell(mocker.Mock(spec=SSDDriver))
+
+    script_collection_file = tmp_path / "shell_scripts.txt"
+    script_collection_file.touch()
+    with script_collection_file.open("w") as f:
+        for script_name in [
+            "NotExisting_Script"
+        ]:
+            f.writelines(script_name)
+
+    with pytest.raises(NotExistingTestScriptError):
+        batch_shell.script_collection_file_path = script_collection_file
+
+
+def test_mocked_batch_shell_with_not_existing_file(tmp_path, capsys, mocker: MockerFixture):
+    # Arrange
+    patch_bash_shell__run_script = mocker.patch("shell.run_shell.BatchShell._run_script")
+    patch_bash_shell__run_script.return_value = False
+
+    batch_shell = BatchShell(mocker.Mock(spec=SSDDriver))
+
+    script_collection_file = tmp_path / "shell_scripts.txt"
+
+    with pytest.raises(NotExistingFileError):
+        batch_shell.script_collection_file_path = script_collection_file
