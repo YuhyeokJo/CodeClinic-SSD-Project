@@ -4,13 +4,12 @@ from abc import ABC, abstractmethod
 # === Shared Constants ===
 VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{8}$")
 VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "exit", "help"}
-MAX_LBA = 99
 LBA_RANGE = range(0, 100)
 SIZE_RANGE = range(1, 11)
 
 
 def is_valid_lba(lba: str) -> bool:
-    return lba.isdigit() and int(lba) in LBA_RANGE
+    return int(lba) in LBA_RANGE and lba.isdigit()
 
 
 def is_valid_hex_data(data: str) -> bool:
@@ -18,7 +17,7 @@ def is_valid_hex_data(data: str) -> bool:
 
 
 def is_valid_size(size: str) -> bool:
-    return size.isdigit() and int(size) in SIZE_RANGE
+    return int(size) in SIZE_RANGE and size.isdigit()
 
 
 class ArgumentValidator(ABC):
@@ -72,8 +71,8 @@ class EraseRangeValidator(ArgumentValidator):
     def validate(self, args: list[str]) -> bool:
         if len(args) != 2:
             return False
-        start_lba, end_lba = args
-        if not is_valid_lba(start_lba) or not end_lba.isdigit():
+        lba_start, lba_end = args
+        if not is_valid_lba(lba_start) or not lba_end.isdigit():
             return False
-        size = str(int(end_lba) - int(start_lba) + 1)
+        size = str(int(lba_end) - int(lba_start) + 1)
         return is_valid_size(size)
