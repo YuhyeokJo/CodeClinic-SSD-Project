@@ -13,7 +13,7 @@ class Help(Command):
             "fullread": "fullread: (Reads value from all LBA(0~99))",
             "fullwrite": "fullwrite <Value> (Writes value to all LBA(0~99))",
             "erase": "erase <LBA> <Size> (Erases value from LBA for size(1~10))",
-            "erase_range": "erase_range <start LBA> <end LBA> (Erases value from start LBA to end LBA (max size: 10)",
+            "erase_range": "erase_range <LBA START> <LBA END> (Erases value from LBA START to LBA END (max size: 10)",
             "help": "help (Print Usage)",
             "exit": "exit (Exit shell)"
         }
