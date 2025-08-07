@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pytest_mock import MockerFixture
 
 from device import ssd
-from device.ssd import SSD, INITIALIZED_DATA, ERROR, OUTPUT_DIR, NAND, OutputWriter
+from device.ssd import SSD, INITIALIZED_DATA, ERROR, OUTPUT_DIR, NAND, OutputWriter, Validator
 
 
 @dataclass
@@ -19,7 +19,9 @@ class WriteCommand:
 @pytest.fixture
 def ssd_instance():
     shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
-    return SSD(nand=NAND(OUTPUT_DIR), output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
+    return SSD(nand=NAND(OUTPUT_DIR),
+               validator=Validator(),
+               output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
 
 
 def test_main_write_command(ssd_instance, mocker: MockerFixture):

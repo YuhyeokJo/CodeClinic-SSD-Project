@@ -27,6 +27,12 @@ class Validator:
         except ValueError:
             return False
 
+    def is_valid_erase_range(self, lba: int, size: int) -> bool:
+        if size > 0:
+            return lba + size - 1 <= MAX_LBA
+        else:
+            return lba + size + 1 >= MIN_LBA
+
 
 class NAND:
     def __init__(self, output_dir):
@@ -59,14 +65,14 @@ class OutputWriter:
 
 
 class SSD(Device):
-    def __init__(self, nand: NAND, output_writer: OutputWriter):
+    def __init__(self, nand: NAND, validator: Validator, output_writer: OutputWriter):
         self.nand = nand
-        self.validator = Validator()
+        self.validator = validator
         self.output_writer = output_writer
 
     def write(self, lba: str, value: str) -> None:
         if not self.validator.is_valid_lba(lba):
-            self._write_output(ERROR)
+            self._write_error()
             return
 
         data = self.nand.load()
@@ -75,7 +81,7 @@ class SSD(Device):
 
     def read(self, lba: str) -> None:
         if not self.validator.is_valid_lba(lba):
-            self._write_output(ERROR)
+            self._write_error()
             return
 
         data = self.nand.load()
@@ -83,44 +89,46 @@ class SSD(Device):
         self._write_output(f"{lba} {result}\n")
 
     def erase(self, lba: str, size: str) -> None:
-        if not self.validator.is_valid_lba(lba):
-            self._write_output(ERROR)
+        if not self._validate_erase_inputs(lba, size):
             return
-
-        if not self.validator.is_valid_erase_size(size):
-            self._write_output(ERROR)
-            return
-
-        if int(size) == 0:
-            return
-
-        lba_int = int(lba)
-        size_int = int(size)
-
-        if size_int > 0:
-            max_addr = lba_int + size_int - 1
-            if max_addr > MAX_LBA:
-                self._write_output(ERROR)
-                return
-        else:
-            min_addr = lba_int + size_int + 1
-            if min_addr < MIN_LBA:
-                self._write_output(ERROR)
-                return
 
         data = self.nand.load()
 
-        if size_int > 0:
-            for addr in range(lba_int, lba_int + size_int, 1):
-                data[str(addr)] = INITIALIZED_DATA
-        else:
-            for addr in range(lba_int + size_int + 1, lba_int + 1, 1):
-                data[str(addr)] = INITIALIZED_DATA
+        for addr in self._erase_range(int(lba), int(size)):
+            data[str(addr)] = INITIALIZED_DATA
 
         self.nand.save(data)
 
+    def _validate_erase_inputs(self, lba: str, size: str) -> bool:
+        if not self.validator.is_valid_lba(lba):
+            self._write_error()
+            return False
+
+        if not self.validator.is_valid_erase_size(size):
+            self._write_error()
+            return False
+
+        if int(size) == 0:
+            return False
+
+        if not self.validator.is_valid_erase_range(int(lba), int(size)):
+            self._write_error()
+            return False
+
+        return True
+
+    def _write_error(self):
+        self.output_writer.write(ERROR)
+
     def _write_output(self, content: str):
         self.output_writer.write(content)
+
+    def _erase_range(self, lba: int, size: int) -> range:
+        if size > 0:
+            return range(lba, lba + size)
+        else:
+            return range(lba + size + 1, lba + 1)
+
 
 def decimal_lba(lba: str):
     if not lba.isdigit():
@@ -167,7 +175,7 @@ def main():
     except SystemExit as e:
         exit(1)
 
-    ssd = SSD(nand=NAND(OUTPUT_DIR), output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
+    ssd = SSD(nand=NAND(OUTPUT_DIR), validator=Validator(), output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
     if args.command == "W":
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":
