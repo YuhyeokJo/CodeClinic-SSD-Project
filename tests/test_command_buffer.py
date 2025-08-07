@@ -166,3 +166,18 @@ def test_merge_when_erases_overlap(capsys):
                             " - 3_empty\n"
                             " - 4_empty\n"
                             " - 5_empty\n")
+
+
+def test_merge_rejected_when_resulting_erase_size_exceeds_ten(capsys):
+    cb = CommandBuffer()
+    cb.add_command("E", "1", "6")
+    cb.add_command("E", "5", "7")
+
+    cb.show_status()
+    captured = capsys.readouterr()
+    assert captured.out == ("=== Buffer 상태 ===\n"
+                            " - 1_E_1_6\n"
+                            " - 2_E_5_7\n"
+                            " - 3_empty\n"
+                            " - 4_empty\n"
+                            " - 5_empty\n")
