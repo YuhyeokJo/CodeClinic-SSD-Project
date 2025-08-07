@@ -38,5 +38,15 @@ class TestLogger(unittest.TestCase):
         log_files = [f for f in files if f.endswith(".log")]
         self.assertGreaterEqual(len(log_files), 2)
 
+    def test_log_compression(self):
+        for _ in range(10000):
+            self.logger.print("TestLogger.test_log_compression()", "압축 조건 만족")
+            time.sleep(0.01)
+
+        files = os.listdir(self.test_dir.name)
+        zip_files = [f for f in files if f.endswith(".zip")]
+        self.assertGreaterEqual(len(zip_files), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
