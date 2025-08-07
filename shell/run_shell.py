@@ -49,7 +49,3 @@ class TestShell:
 def main():
     shell = TestShell(SSDDriver())
     shell.run()
-
-
-if __name__ == "__main__":
-    main()
