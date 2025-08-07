@@ -8,7 +8,7 @@ from shell.commands.write import Write
 from shell.commands.help import Help
 from shell.commands.exit import Exit
 from shell.driver import SSDDriver
-from shell.run_shell import TestShell
+from shell.run_shell import InteractiveShell
 from shell.run_shell import run_interactive_shell
 
 
@@ -56,7 +56,7 @@ Tests using moced ssd driver
 @pytest.fixture
 def mocked_driver_shell_input(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
-    test_shell = TestShell(driver)
+    test_shell = InteractiveShell(driver)
     input_patch = mocker.patch("shell.run_shell.input")
 
     return driver, test_shell, input_patch
@@ -65,7 +65,7 @@ def mocked_driver_shell_input(mocker: MockerFixture):
 def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
 
-    test_shell = TestShell(driver)
+    test_shell = InteractiveShell(driver)
 
     assert isinstance(test_shell._commands["write"], Write)
     assert isinstance(test_shell._commands["read"], Read)

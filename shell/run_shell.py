@@ -17,7 +17,7 @@ from shell.logger import Logger
 INVALID_COMMAND = "INVALID COMMAND"
 
 
-class TestShell:
+class InteractiveShell:
     def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._commands: dict[str, Command] = {}
@@ -65,14 +65,17 @@ class TestShell:
             if isinstance(command, Exit):
                 return
 
+
 def run_interactive_shell():
-    shell = TestShell(SSDDriver())
+    shell = InteractiveShell(SSDDriver())
     shell.run()
+
 
 def exist_file(file_name: str) -> str:
     if not Path(file_name).exists():
         raise argparse.ArgumentTypeError(f"{file_name}은 존재하지 않는 파일입니다.")
     return file_name
+
 
 def main():
     parser = argparse.ArgumentParser(description="Shell mode")
