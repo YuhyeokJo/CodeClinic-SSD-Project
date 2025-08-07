@@ -75,7 +75,7 @@ class CommandBuffer:
             if parsed:
                 commands.append(parsed)
 
-        # 2. Write 중복 제거 (가장 마지막 것만 남김)
+        # 2. 같은 lba (가장 마지막 것만 남김)
         latest_write = {}
         latest_erase = {}
         for cmd in commands:
@@ -87,7 +87,21 @@ class CommandBuffer:
                 if lba not in latest_erase or size > int(latest_erase[lba][4]):
                     latest_erase[lba] = cmd
 
-        final_cmds = list(latest_write.values()) + list(latest_erase.values())
+        result = []
+        for lba, w_cmd in latest_write.items():
+            _, _, _, lba, _ = w_cmd
+            lba = int(lba)
+            erased = False
+            for _, _, _, erase_lba, size in latest_erase.values():
+                erase_lba = int(erase_lba)
+                size = int(size)
+                if erase_lba <= lba < erase_lba + size:
+                    erased = True
+                    break
+            if not erased:
+                result.append(w_cmd)
+
+        final_cmds = result + list(latest_erase.values())
 
         for fname in files:
             if "empty" not in fname:
