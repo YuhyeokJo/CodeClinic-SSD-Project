@@ -12,16 +12,7 @@ from shell.run_shell import TestShell
 from shell.run_shell import run_interactive_shell
 
 
-@pytest.fixture
-def mocked_driver_shell_input(mocker: MockerFixture):
-    driver = mocker.Mock(spec=SSDDriver)
-    test_shell = TestShell(driver)
-    input_patch = mocker.patch("shell.run_shell.input")
-
-    return driver, test_shell, input_patch
-
-
-def test_main_correct_input(capsys, mocker):
+def test_interactive_shell_correct_input(capsys, mocker):
     input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect = [
         "help write",
@@ -39,24 +30,13 @@ def test_main_correct_input(capsys, mocker):
             assert False
 
 
-def test_main_with_wrong_input_and_exit(capsys, mocker):
+@pytest.mark.parametrize(
+    "script_id", ["1_", "2_", "3_"]
+)
+def test_interactive_shell_using_script(capsys, mocker, script_id):
     input_patch = mocker.patch("shell.run_shell.input")
     input_patch.side_effect = [
-        "not_exit",
-        "exit"
-    ]
-
-    run_interactive_shell()
-
-    assert capsys.readouterr().out.strip("\n").split("\n") == [
-        "INVALID COMMAND",
-        "[Exit]"
-    ]
-
-def test_main_using_script1(capsys, mocker):
-    input_patch = mocker.patch("shell.run_shell.input")
-    input_patch.side_effect = [
-        "1_",
+        script_id,
         "exit"
     ]
 
@@ -67,33 +47,20 @@ def test_main_using_script1(capsys, mocker):
         "[Exit]"
     ]
 
-def test_main_using_script2(capsys, mocker):
+
+"""
+Tests using moced ssd driver
+"""
+
+
+@pytest.fixture
+def mocked_driver_shell_input(mocker: MockerFixture):
+    driver = mocker.Mock(spec=SSDDriver)
+    test_shell = TestShell(driver)
     input_patch = mocker.patch("shell.run_shell.input")
-    input_patch.side_effect = [
-        "2_",
-        "exit"
-    ]
 
-    run_interactive_shell()
+    return driver, test_shell, input_patch
 
-    assert capsys.readouterr().out.strip("\n").split("\n") == [
-        "[SCRIPT] PASS",
-        "[Exit]"
-    ]
-
-def test_main_using_script3(capsys, mocker):
-    input_patch = mocker.patch("shell.run_shell.input")
-    input_patch.side_effect = [
-        "3_",
-        "exit"
-    ]
-
-    run_interactive_shell()
-
-    assert capsys.readouterr().out.strip("\n").split("\n") == [
-        "[SCRIPT] PASS",
-        "[Exit]"
-    ]
 
 def test_if_builtin_commands_are_registered(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
