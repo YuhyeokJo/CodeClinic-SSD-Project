@@ -29,6 +29,7 @@ def ssd_instance():
                )
 
     command_buffer.on_flush_callback = ssd1.flush
+    command_buffer.initialize_buffer()
 
     return ssd1
 
