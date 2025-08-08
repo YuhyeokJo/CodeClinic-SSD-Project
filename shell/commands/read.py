@@ -17,5 +17,5 @@ class Read(Command):
             lba = args[0]
             result = f"[{self.name}] LBA {lba}: {self._driver.read(lba)}"
 
-        self.log(result)
+        self.log(result, 3)
         return result

@@ -9,7 +9,7 @@ class Script1(Command):
 
     def execute(self, args: list[str] = None) -> str:
         result = self.script_runner.full_write_and_read_compare()
-        self.log(f"[{self.name}] Done")
+        self.log(f"[{self.name}] Done", 1)
         return result
 
 
@@ -19,7 +19,7 @@ class Script2(Command):
 
     def execute(self, args: list[str] = None) -> str:
         result = self.script_runner.partial_lba_write()
-        self.log(f"[{self.name}] Done")
+        self.log(f"[{self.name}] Done", 1)
         return result
 
 
@@ -29,7 +29,7 @@ class Script3(Command):
 
     def execute(self, args: list[str] = None) -> str:
         result = self.script_runner.write_read_aging()
-        self.log(f"[{self.name}] Done")
+        self.log(f"[{self.name}] Done", 1)
         return result
 
 
@@ -39,5 +39,5 @@ class Script4(Command):
 
     def execute(self, args: list[str] = None) -> str:
         result = self.script_runner.erase_and_write_aging()
-        self.log(f"[{self.name}] Done")
+        self.log(f"[{self.name}] Done", 1)
         return result

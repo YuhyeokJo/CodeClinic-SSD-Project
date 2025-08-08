@@ -15,4 +15,5 @@ class Exit(Command):
             result = INVALID_COMMAND
         else:
             result = f"[{self.name}]"
+        self.log(result, 1)
         return result

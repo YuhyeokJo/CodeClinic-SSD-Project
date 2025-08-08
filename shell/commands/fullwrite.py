@@ -30,5 +30,5 @@ class FullWrite(Command):
         else:
             result = self.execute_multiple_write(args[0])
 
-        self.log(result)
+        self.log(result, 2)
         return result

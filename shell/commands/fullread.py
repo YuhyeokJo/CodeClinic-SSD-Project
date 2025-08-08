@@ -24,9 +24,9 @@ class FullRead(Command):
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
             result = INVALID_COMMAND
-            self.log(result)
+            self.log(result,2)
         else:
             result = self.excute_multiple_read()
-            self.log(f"[{self.name}] Done")
+            self.log(f"[{self.name}] Done", 2)
 
         return result

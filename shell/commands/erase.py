@@ -59,4 +59,3 @@ class Erase(Command):
                 result.append([str(start_new), str(current_size)])
                 start -= current_size
                 size -= current_size
-        return result

@@ -37,5 +37,5 @@ class Help(Command):
             cmd = args[0].lower()
             result = self.format_help(cmd, self._help_map[cmd])
 
-        self.log(result)
+        self.log(result, 1)
         return result

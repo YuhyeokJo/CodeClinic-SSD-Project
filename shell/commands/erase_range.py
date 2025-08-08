@@ -28,7 +28,7 @@ class EraseRange(Command):
             else:
                 result = f"[{self.name}] Done"
 
-        self.log(result)
+        self.log(result, 2)
         return result
 
     def _get_size(self, lba_end, lba_start):
