@@ -1,3 +1,5 @@
+import contextlib
+import io
 from pathlib import Path
 
 from device import Device
@@ -16,11 +18,11 @@ MIN_SIZE = 0
 MAX_SIZE = 10
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
-
+VALID_LBA_PATTERN = re.compile(r"[1-9]?[0-9]")
 
 class Validator:
     def is_valid_lba(self, lba: str) -> bool:
-        return lba.isdigit() and MIN_LBA <= int(lba) <= MAX_LBA
+        return bool(VALID_LBA_PATTERN.fullmatch(lba)) and int(lba) in LBA_RANGE
 
     def is_valid_erase_size(self, size: str) -> bool:
         try:
@@ -190,8 +192,10 @@ def main():
     erase_parser.add_argument("size", type=integer_size, help="Value to write")
 
     try:
-        args = parser.parse_args()
+        with contextlib.redirect_stderr(io.StringIO()):
+            args = parser.parse_args()
     except SystemExit as e:
+        OutputWriter(OUTPUT_DIR / "ssd_output.txt").write(ERROR)
         exit(1)
 
     command_buffer = CommandBuffer()
