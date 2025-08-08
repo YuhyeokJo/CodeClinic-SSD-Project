@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from command_buffer.command_buffer import CommandBuffer
 from device import Device
+from command_buffer import CommandBuffer
 import argparse
 import re
 
