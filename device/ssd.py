@@ -12,7 +12,7 @@ MAX_LBA = 99
 MIN_LBA = 0
 LBA_RANGE = range(0, MAX_LBA + 1)
 
-MIN_SIZE = -10
+MIN_SIZE = 0
 MAX_SIZE = 10
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
@@ -100,15 +100,10 @@ class SSD(Device):
             return
 
         if self.command_buffer:
-            # command buffer 측에서 Erase size를 양수로만 고려(음수가 되면 까다로운 관계로)
-            if int(size) < 0:
-                lba = str(int(lba) + int(size) + 1)
-                size = str(-int(size))
-
             self.command_buffer.add_command(cmd_type="E", lba=lba, value_or_size=size)
         else:
             data = self.nand.load()
-            for addr in self._erase_range(int(lba), int(size)):
+            for addr in range(int(lba), int(lba) + int(size)):
                 data[str(addr)] = INITIALIZED_DATA
             self.nand.save(data)
 
@@ -136,12 +131,6 @@ class SSD(Device):
     def _write_output(self, content: str):
         self.output_writer.write(content)
 
-    def _erase_range(self, lba: int, size: int) -> range:
-        if size > 0:
-            return range(lba, lba + size)
-        else:
-            return range(lba + size + 1, lba + 1)
-
     def flush(self):
         if self.command_buffer is None:
             return
@@ -154,7 +143,7 @@ class SSD(Device):
                 self.nand.save(data)
             elif cmd_type == "E":
                 data = self.nand.load()
-                for addr in self._erase_range(int(lba), int(val_or_size)):
+                for addr in range(int(lba), int(lba) + int(val_or_size)):
                     data[str(addr)] = INITIALIZED_DATA
                 self.nand.save(data)
         self.command_buffer.flush()
