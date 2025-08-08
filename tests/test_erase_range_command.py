@@ -24,9 +24,17 @@ def test_erase_range_correctly_with_over_size(capsys, mocker: MockerFixture):
     assert actual == DONE
 
 
+def test_erase_range_correctly_with_reverse_argument(capsys, mocker: MockerFixture):
+    mocked_ssd = mocker.Mock(spec=SSDDriver)
+    mocked_ssd.erase.return_value = True
+    erase_command = EraseRange(mocked_ssd)
+    actual = erase_command.execute(["50", "40"])
+    assert actual == DONE
+
+
 @pytest.mark.parametrize(
     "wrong_argument", [
-        ["1", "12"],
+        ["10", "-12"],
         ["100", "101"],
         ["-1", "5"],
     ]

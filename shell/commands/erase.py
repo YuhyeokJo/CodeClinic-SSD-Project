@@ -51,7 +51,8 @@ class Erase(Command):
                     current_size = start - LBA_START + 1
                     if current_size <= 0:
                         break
-                result.append([str(start), str(-current_size)])
+                start_new = start - current_size + 1
+                result.append([str(start_new), str(current_size)])
                 start -= current_size
                 size -= current_size
         return result
