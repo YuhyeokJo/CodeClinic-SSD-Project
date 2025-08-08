@@ -1,8 +1,7 @@
 import re
 from abc import ABC, abstractmethod
 
-VALID_LBA_PATTERN = re.compile(r"[1-9]?[0-9]")
-from shell.command_constants import LBA_RANGE, VALID_HEX_PATTERN, VALID_COMMANDS
+from shell.command_constants import LBA_RANGE, VALID_HEX_PATTERN, VALID_LBA_PATTERN, VALID_COMMANDS
 
 
 def is_valid_lba(lba: str) -> bool:
