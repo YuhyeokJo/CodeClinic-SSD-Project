@@ -60,8 +60,8 @@ class InteractiveShell:
 
                 continue
 
-            self._logger.print("TestShell.run()", 'EXECUTE COMMAND')
             command = self._commands[cmd]
+            self._logger.print("TestShell.run()", f"EXECUTE {command}")
             command_return = command.execute(args)
             print(command_return)
 
