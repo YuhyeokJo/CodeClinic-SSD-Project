@@ -296,14 +296,12 @@ def test_erase_success(ssd_instance):
     assert actual == f"2 {INITIALIZED_DATA}\n3 {INITIALIZED_DATA}\n4 {INITIALIZED_DATA}\n5 {INITIALIZED_DATA}\n"
 
 
-def test_erase_success2(ssd_instance):
+def test_erase_error_on_negative_size(ssd_instance):
     ssd_instance.erase('0', '-1')
-    ssd_instance.flush()
-
-    with open(ssd_instance.nand.path, "r") as f:
+    with open(ssd_instance.output_writer.output_file, "r") as f:
         actual = f.read()
 
-    assert actual == f"0 {INITIALIZED_DATA}\n"
+    assert actual == f"{ERROR}"
 
 
 def test_write_and_erase_success(ssd_instance):
