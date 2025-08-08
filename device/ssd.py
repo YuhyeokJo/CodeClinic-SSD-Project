@@ -80,10 +80,8 @@ class SSD(Device):
             return
 
         if self.command_buffer:
-            print("in")
             self.command_buffer.add_command(cmd_type="W", lba=lba, value_or_size=value)
         else:
-            print("12233")
             data = self.nand.load()
             data[lba] = value
             self.nand.save(data)
