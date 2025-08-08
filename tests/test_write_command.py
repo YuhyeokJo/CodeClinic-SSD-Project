@@ -63,9 +63,9 @@ def test_write_wrongly_with_minus_lba(mocker: MockerFixture, wrong_argument):
 
 def test_write_command():
     ssd_driver = SSDDriver()
-    writeCommand = Write(ssd_driver)
+    write_command = Write(ssd_driver)
 
-    assert DONE == writeCommand.execute(['42', "0x12345678"])
+    assert DONE == write_command.execute(['42', "0x12345678"])
 
 def test_if_write_command_normalize_hex_data(mocker: MockerFixture):
     mocked_ssd = mocker.Mock(spec=SSDDriver)
