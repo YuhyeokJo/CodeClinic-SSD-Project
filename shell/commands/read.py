@@ -13,11 +13,10 @@ class Read(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            self.log(f"{self._name}.execute()", INVALID_COMMAND)
-            return INVALID_COMMAND
+            result = INVALID_COMMAND
+        else:
+            lba = args[0]
+            result = f"[Read] LBA {lba}: {self._driver.read(lba)}"
 
-        lba = args[0]
-        result = f"[Read] LBA {lba}: {self._driver.read(lba)}"
-        self.log(f"{self._name}.execute()", result)
-
+        self.log(self._name, result)
         return result

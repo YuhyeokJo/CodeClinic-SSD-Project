@@ -5,7 +5,8 @@ from shell.logger import Logger
 class Command(ABC):
     _logger = Logger()
 
-    def log(self, func: str, msg: str):
+    def log(self, command_name: str, msg: str):
+        func = f"{command_name}.execute()"
         self._logger.print(func, msg)
 
     @abstractmethod
