@@ -2,7 +2,7 @@ import re
 from abc import ABC, abstractmethod
 
 # === Shared Constants ===
-VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{8}$")
+VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{1,8}$")
 VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "flush", "exit", "help"}
 LBA_RANGE = range(0, 100)
 SIZE_RANGE = range(1, 11)

@@ -1,6 +1,6 @@
 import pytest
 
-from shell.command_validator import is_valid_lba, LBA_RANGE
+from shell.command_validator import is_valid_lba, LBA_RANGE, is_valid_hex_data, WriteValidator
 
 
 @pytest.mark.parametrize(
@@ -19,3 +19,12 @@ def test_if_lba_validate_correct_number(correct_string):
 )
 def test_if_lba_validate_wrong_number_as_false(wrong_string):
     assert is_valid_lba(wrong_string) == False
+
+
+@pytest.mark.parametrize(
+    "wrong_args", [
+        ["3"], ["3", "0xG"], ["3", "0x000000000"]
+    ]
+)
+def test_if_write_validate_wrong_args_as_false(wrong_args):
+    assert WriteValidator().validate(wrong_args) == False
