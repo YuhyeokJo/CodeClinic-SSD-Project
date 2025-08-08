@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 # === Shared Constants ===
 VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{8}$")
-VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "exit", "help"}
+VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "flush", "exit", "help"}
 LBA_RANGE = range(0, 100)
 SIZE_RANGE = range(1, 11)
 
@@ -82,3 +82,8 @@ class EraseRangeValidator(ArgumentValidator):
         else:
             size = 0
         return is_valid_size(size)
+
+
+class FlushValidator(ArgumentValidator):
+    def validate(self, args: list[str]) -> bool:
+        return len(args) == 0

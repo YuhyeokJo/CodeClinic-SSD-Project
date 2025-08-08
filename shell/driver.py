@@ -21,7 +21,6 @@ class SSDDriver:
             f"python {Path(__file__).parent.parent / 'device/ssd.py'} W {lba} {data}",
             shell=True
         )
-
         return True
 
     def erase(self, lba: str, size: str):
@@ -29,5 +28,11 @@ class SSDDriver:
             f"python {Path(__file__).parent.parent / 'device/ssd.py'} E {lba} {size}",
             shell=True
         )
+        return True
 
+    def flush(self):
+        subprocess.run(
+            f"python {Path(__file__).parent.parent / 'device/ssd.py'} F",
+            shell=True
+        )
         return True
