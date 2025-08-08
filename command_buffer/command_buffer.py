@@ -5,11 +5,11 @@ MAX_COMMANDS = 5
 
 
 class CommandBuffer:
-    def __init__(self):
+    def __init__(self, on_flush_callback=None):
         self.output_dir = Path(__file__).resolve().parent.parent / "buffer"
         self.output_dir.mkdir(exist_ok=True)
-
         os.makedirs(self.output_dir, exist_ok=True)
+        self.on_flush_callback = on_flush_callback
         self._initialize_files()
 
     def _initialize_files(self):
@@ -35,7 +35,11 @@ class CommandBuffer:
     def add_command(self, cmd_type, lba, value_or_size):
         slot = self._get_slot_index()
         if slot is None:
-            self.flush()
+            # SSD에 flush Callback할 용도
+            if self.on_flush_callback:
+                self.on_flush_callback()
+            else:
+                self.flush()
             slot = self._get_slot_index()
         filename = f"{slot}_{cmd_type}_{lba}_{value_or_size}"
         filepath = os.path.join(self.output_dir, filename)
@@ -195,3 +199,18 @@ class CommandBuffer:
     def show_status(self):
         for f in sorted(os.listdir(self.output_dir)):
             print(f" - {f}")
+
+    def get_commands(self):
+        commands = []
+        for fname in sorted(os.listdir(self.output_dir)):
+            if "empty" in fname:
+                continue
+            parts = fname.split("_")
+            if len(parts) != 4:
+                continue
+            slot = int(parts[0])
+            cmd_type = parts[1]
+            lba = parts[2]
+            val_or_size = parts[3]
+            commands.append((slot, cmd_type, lba, val_or_size))
+        return commands
