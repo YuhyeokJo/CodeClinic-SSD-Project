@@ -6,10 +6,10 @@ VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{8}$")
 VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "flush", "exit", "help"}
 LBA_RANGE = range(0, 100)
 SIZE_RANGE = range(1, 11)
-
+VALID_LBA_PATTERN = re.compile(r"[1-9]?[0-9]")
 
 def is_valid_lba(lba: str) -> bool:
-    return lba.isdigit() and int(lba) in LBA_RANGE
+    return bool(VALID_LBA_PATTERN.fullmatch(lba)) and int(lba) in LBA_RANGE
 
 
 def is_valid_hex_data(data: str) -> bool:
