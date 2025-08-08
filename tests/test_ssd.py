@@ -81,9 +81,15 @@ def test_main_other_command(ssd_instance, mocker: MockerFixture, invalid_lba, ca
     with pytest.raises(SystemExit):
         ssd.main()
 
-    capsys.readouterr()
+    assert capsys.readouterr().err == ""
+    assert capsys.readouterr().out == ""
     mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
+
+    with open(ssd_instance.output_writer.output_file, "r") as f:
+        actual = f.read()
+
+    assert actual == f"{ERROR}"
 
 
 @pytest.mark.parametrize("invalid_lba", [
@@ -101,9 +107,15 @@ def test_lba_should_be_decimal(ssd_instance, mocker: MockerFixture, invalid_lba,
     with pytest.raises(SystemExit):
         ssd.main()
 
-    capsys.readouterr()
+    assert capsys.readouterr().err == ""
+    assert capsys.readouterr().out == ""
     mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
+
+    with open(ssd_instance.output_writer.output_file, "r") as f:
+        actual = f.read()
+
+    assert actual == f"{ERROR}"
 
 
 @pytest.mark.parametrize("invalid_value", [
@@ -121,9 +133,15 @@ def test_value_always_startswith_0x_and_length_10(ssd_instance, mocker: MockerFi
     sys.argv = ['ssd.py', 'W', '2', invalid_value]
     with pytest.raises(SystemExit):
         ssd.main()
-    capsys.readouterr()
+    assert capsys.readouterr().err == ""
+    assert capsys.readouterr().out == ""
     mock_ssd.read.assert_not_called()
     mock_ssd.write.assert_not_called()
+
+    with open(ssd_instance.output_writer.output_file, "r") as f:
+        actual = f.read()
+
+    assert actual == f"{ERROR}"
 
 
 def test_write_when_no_ssd_nand_text_create_then_write(ssd_instance):
@@ -330,3 +348,13 @@ def test_erase_zero_size_success(ssd_instance, lba):
     with pytest.raises(FileNotFoundError):
         with open(ssd_instance.nand.path, "r") as f:
             f.read()
+
+def test_no_console_output_if_use_correct_arg(ssd_instance, mocker: MockerFixture, capsys):
+    mock_ssd = mocker.Mock(spec=SSD)
+    mocker.patch('device.ssd.SSD', return_value=mock_ssd)
+
+    sys.argv = ['ssd.py', 'R', '2']
+    ssd.main()
+
+    assert capsys.readouterr().err == ""
+    assert capsys.readouterr().out == ""
