@@ -1,4 +1,4 @@
-from command_buffer.command_buffer import CommandBuffer
+from device import CommandBuffer
 
 
 def test_add_one_command():
