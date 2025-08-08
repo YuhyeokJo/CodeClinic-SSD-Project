@@ -20,12 +20,15 @@ class FullWrite(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            return INVALID_COMMAND
+            result = INVALID_COMMAND
 
-        data = args[0]
+        else:
+            data = args[0]
+            for LBA in range(LBA_START, LBA_END):
+                if self._write.execute([str(LBA), data]) == INVALID_COMMAND:
+                    result = INVALID_COMMAND
+                    break
+            result = FULL_WRITE_DONE
 
-        for LBA in range(LBA_START, LBA_END):
-            if self._write.execute([str(LBA), data]) == INVALID_COMMAND:
-                return INVALID_COMMAND
-
-        return FULL_WRITE_DONE
+        self.log(result)
+        return result
