@@ -82,3 +82,8 @@ class EraseRangeValidator(ArgumentValidator):
         else:
             size = 0
         return is_valid_size(size)
+
+
+class FlushValidator(ArgumentValidator):
+    def validate(self, args: list[str]) -> bool:
+        return len(args) == 0

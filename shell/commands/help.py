@@ -14,6 +14,7 @@ class Help(Command):
             "fullwrite": "fullwrite <Value> (Writes value to all LBA(0~99))",
             "erase": "erase <LBA> <Size> (Erases value from LBA for size(1~10))",
             "erase_range": "erase_range <LBA START> <LBA END> (Erases value from LBA START to LBA END (max size: 10)",
+            "flush": "flush (Flushes command buffer)",
             "help": "help (Print Usage)",
             "exit": "exit (Exit shell)"
         }
