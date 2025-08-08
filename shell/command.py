@@ -5,8 +5,13 @@ from shell.logger import Logger
 class Command(ABC):
     _logger = Logger()
 
-    def log(self, command_name: str, msg: str):
-        func = f"{command_name}.execute()"
+    @property
+    def name(self):
+        return self.__class__.__name__
+
+
+    def log(self, msg: str):
+        func = f"{self.name}.execute()"
         self._logger.print(func, msg)
 
     @abstractmethod
