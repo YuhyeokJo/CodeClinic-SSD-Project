@@ -6,7 +6,6 @@ LBA_START = 0
 LBA_END = 99
 ERASE_SIZE = 10
 
-DONE = "[Erase] Done"
 INVALID_COMMAND = "INVALID COMMAND"
 
 
@@ -17,15 +16,20 @@ class Erase(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            return INVALID_COMMAND
-        lba, size = args
-        erase_splits = self._split_range(lba, size)
-        for split in erase_splits:
-            lba_split, size_split = split
-            result = self._driver.erase(lba_split, size_split)
-            if not result:
-                return INVALID_COMMAND
-        return DONE
+            result = INVALID_COMMAND
+        else:
+            lba, size = args
+            erase_splits = self._split_range(lba, size)
+            for split in erase_splits:
+                lba_split, size_split = split
+                result = self._driver.erase(lba_split, size_split)
+                if not result:
+                    result = f"[{self.name}] Fail"
+                    break
+            else:
+                result = f"[{self.name}] Done"
+            self.log(result)
+            return result
 
     def _split_range(self, lba: str, size: str):
         start = int(lba)
