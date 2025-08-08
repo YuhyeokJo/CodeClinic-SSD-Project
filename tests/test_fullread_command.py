@@ -26,7 +26,6 @@ def test_fullread_result(mocker: MockerFixture):
     assert full_reader.execute([]) == result
 
 
-@pytest.mark.skip(reason="command buffer의 fastread가 아직 준비 되지 않았습니다.")
 def test_fullread_command(mocker: MockerFixture):
     driver = SSDDriver()
     full_write = FullWrite(driver)
