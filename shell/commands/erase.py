@@ -1,14 +1,21 @@
 from shell.command import Command
-from shell.command_constants import INVALID_COMMAND, LBA_END
+from shell.command_constants import INVALID_COMMAND, LBA_START, LBA_END, ERASE_SIZE
 from shell.command_validator import EraseValidator
 from shell.driver import SSDDriver
 
-ERASE_SIZE = 10
 
 class Erase(Command):
     def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._validator = EraseValidator()
+
+    def execute_multiple_erase(self, erase_splits):
+        for split in erase_splits:
+            lba_split, size_split = split
+            result = self._driver.erase(lba_split, size_split)
+            if not result:
+                return f"[{self.name}] Fail"
+        return f"[{self.name}] Done"
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
@@ -16,14 +23,7 @@ class Erase(Command):
         else:
             lba, size = args
             erase_splits = self._split_range(lba, size)
-            for split in erase_splits:
-                lba_split, size_split = split
-                result = self._driver.erase(lba_split, size_split)
-                if not result:
-                    result = f"[{self.name}] Fail"
-                    break
-            else:
-                result = f"[{self.name}] Done"
+            result = self.execute_multiple_erase(erase_splits)
 
         self.log(result, 3)
         return result
@@ -56,3 +56,4 @@ class Erase(Command):
                 result.append([str(start_new), str(current_size)])
                 start -= current_size
                 size -= current_size
+        return result
