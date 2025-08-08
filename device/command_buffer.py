@@ -61,11 +61,11 @@ class CommandBuffer:
             val_or_size = parts[3]
 
             if cmd_type == "W":
-                if read_lba == lba:
+                if int(read_lba) == int(lba):
                     return val_or_size
 
             if cmd_type == "E":
-                if read_lba in list(range(int(lba), int(val_or_size))):
+                if int(lba) <= int(read_lba) < int(lba) + int(val_or_size):
                     return "0x00000000"
         return None
 
