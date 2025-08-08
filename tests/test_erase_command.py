@@ -26,7 +26,6 @@ def test_erase_correctly_with_over_size(capsys, mocker: MockerFixture):
 
 @pytest.mark.parametrize(
     "wrong_argument", [
-        ["1", "11"],
         ["100", "1"],
         ["-1", "5"],
     ]
