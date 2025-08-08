@@ -16,8 +16,8 @@ def is_valid_hex_data(data: str) -> bool:
     return bool(VALID_HEX_PATTERN.fullmatch(data))
 
 
-def is_valid_size(size: str) -> bool:
-    return -10 <= int(size) <= 10
+def is_valid_size(size: str):
+    return bool(re.fullmatch(r"-?\d+", size))
 
 
 class ArgumentValidator(ABC):
@@ -72,16 +72,7 @@ class EraseRangeValidator(ArgumentValidator):
         if len(args) != 2:
             return False
         lba_start, lba_end = args
-        if not is_valid_lba(lba_start) or not lba_end.isdigit():
-            return False
-        diff = int(lba_end) - int(lba_start)
-        if diff > 0:
-            size = str(diff + 1)
-        elif diff < 0:
-            size = str(diff - 1)
-        else:
-            size = 0
-        return is_valid_size(size)
+        return is_valid_lba(lba_start) and lba_end.isdigit()
 
 
 class FlushValidator(ArgumentValidator):

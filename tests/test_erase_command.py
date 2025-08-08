@@ -24,9 +24,16 @@ def test_erase_correctly_with_over_size(capsys, mocker: MockerFixture):
     assert actual == DONE
 
 
+def test_erase_correctly_with_large_size(capsys, mocker: MockerFixture):
+    mocked_ssd = mocker.Mock(spec=SSDDriver)
+    mocked_ssd.erase.return_value = True
+    erase_command = Erase(mocked_ssd)
+    actual = erase_command.execute(["10", "30"])
+    assert actual == DONE
+
+
 @pytest.mark.parametrize(
     "wrong_argument", [
-        ["1", "11"],
         ["100", "1"],
         ["-1", "5"],
     ]
@@ -45,11 +52,13 @@ def test_erase_correctly_with_ssd():
     actual = erase_command.execute(["3", "1"])
     assert actual == DONE
 
+
 def test_erase_correctly_with_ssd_neg_size():
     driver = SSDDriver()
     erase_command = Erase(driver)
     actual = erase_command.execute(["3", "-2"])
     assert actual == DONE
+
 
 def test_erase_correctly_with_ssd_zero_size():
     driver = SSDDriver()
