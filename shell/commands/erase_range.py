@@ -27,10 +27,11 @@ class EraseRange(Command):
         return DONE
 
     def _get_size(self, lba_end, lba_start):
-        if (int(lba_end) - int(lba_start)) > 0:
-            size = str(int(lba_end) - int(lba_start) + 1)
-        elif (int(lba_end) - int(lba_start)) < 0:
-            size = str(int(lba_end) - int(lba_start) - 1)
+        diff = int(lba_end) - int(lba_start)
+        if diff > 0:
+            size = str(diff + 1)
+        elif diff < 0:
+            size = str(diff - 1)
         else:
             size = str(0)
         return size
