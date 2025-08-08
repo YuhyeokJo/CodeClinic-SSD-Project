@@ -194,6 +194,8 @@ def main():
     erase_parser.add_argument("lba", type=decimal_lba, help="LBA to Erase")
     erase_parser.add_argument("size", type=integer_size, help="Value to write")
 
+    subparsers.add_parser("F", help="Flush all data")
+
     try:
         args = parser.parse_args()
     except SystemExit as e:
