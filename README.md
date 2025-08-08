@@ -1,3 +1,7 @@
+## 개발 환경
+- Python 3.11 이상 권장
+- 패키지 설치: `pip install -r requirements.txt`
+
 # RULE
 ## 브랜치
 ### 네이밍: 타입/설명
