@@ -326,3 +326,13 @@ def test_erase_zero_size_success(ssd_instance, lba):
     with pytest.raises(FileNotFoundError):
         with open(ssd_instance.nand.path, "r") as f:
             f.read()
+
+
+def test_write_read(ssd_instance):
+    ssd_instance.write("10", "0xAABBCCDD")
+
+    ssd_instance.read("10")
+    with open(ssd_instance.output_writer.output_file, "r") as f:
+        result = f.read()
+
+    assert result == "10 0xAABBCCDD\n"

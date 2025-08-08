@@ -51,6 +51,25 @@ class CommandBuffer:
             os.remove(empty_path)
         self.ignore_command_optimization()
 
+    def fastread(self, read_lba):
+        for fname in reversed(sorted(os.listdir(self.output_dir))):
+            if "empty" in fname:
+                continue
+
+            parts = fname.split("_")
+            cmd_type = parts[1]
+            lba = parts[2]
+            val_or_size = parts[3]
+
+            if cmd_type == "W":
+                if read_lba == lba:
+                    return val_or_size
+
+            if cmd_type == "E":
+                if read_lba in list(range(int(lba), int(val_or_size))):
+                    return "0x00000000"
+        return None
+
     def flush(self):
         self._initialize_files()
 
