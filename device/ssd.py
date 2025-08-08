@@ -1,4 +1,6 @@
 from pathlib import Path
+
+from command_buffer.command_buffer import CommandBuffer
 from device import Device
 import argparse
 import re
@@ -65,19 +67,24 @@ class OutputWriter:
 
 
 class SSD(Device):
-    def __init__(self, nand: NAND, validator: Validator, output_writer: OutputWriter):
+    def __init__(self, nand: NAND, validator: Validator, output_writer: OutputWriter,
+                 command_buffer: CommandBuffer = None):
         self.nand = nand
         self.validator = validator
         self.output_writer = output_writer
+        self.command_buffer = command_buffer
 
     def write(self, lba: str, value: str) -> None:
         if not self.validator.is_valid_lba(lba):
             self._write_error()
             return
 
-        data = self.nand.load()
-        data[lba] = value
-        self.nand.save(data)
+        if self.command_buffer:
+            self.command_buffer.add_command(cmd_type="W", lba=lba, value_or_size=value)
+        else:
+            data = self.nand.load()
+            data[lba] = value
+            self.nand.save(data)
 
     def read(self, lba: str) -> None:
         if not self.validator.is_valid_lba(lba):
@@ -92,12 +99,18 @@ class SSD(Device):
         if not self._validate_erase_inputs(lba, size):
             return
 
-        data = self.nand.load()
+        if self.command_buffer:
+            # command buffer 측에서 Erase size를 양수로만 고려(음수가 되면 까다로운 관계로)
+            if int(size) < 0:
+                lba = str(int(lba) + int(size) + 1)
+                size = str(-int(size))
 
-        for addr in self._erase_range(int(lba), int(size)):
-            data[str(addr)] = INITIALIZED_DATA
-
-        self.nand.save(data)
+            self.command_buffer.add_command(cmd_type="E", lba=lba, value_or_size=size)
+        else:
+            data = self.nand.load()
+            for addr in self._erase_range(int(lba), int(size)):
+                data[str(addr)] = INITIALIZED_DATA
+            self.nand.save(data)
 
     def _validate_erase_inputs(self, lba: str, size: str) -> bool:
         if not self.validator.is_valid_lba(lba):
@@ -128,6 +141,23 @@ class SSD(Device):
             return range(lba, lba + size)
         else:
             return range(lba + size + 1, lba + 1)
+
+    def flush(self):
+        if self.command_buffer is None:
+            return
+
+        commands = self.command_buffer.get_commands()
+        for _, cmd_type, lba, val_or_size in commands:
+            if cmd_type == "W":
+                data = self.nand.load()
+                data[lba] = val_or_size
+                self.nand.save(data)
+            elif cmd_type == "E":
+                data = self.nand.load()
+                for addr in self._erase_range(int(lba), int(val_or_size)):
+                    data[str(addr)] = INITIALIZED_DATA
+                self.nand.save(data)
+        self.command_buffer.flush()
 
 
 def decimal_lba(lba: str):
@@ -175,13 +205,25 @@ def main():
     except SystemExit as e:
         exit(1)
 
-    ssd = SSD(nand=NAND(OUTPUT_DIR), validator=Validator(), output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
+    command_buffer = CommandBuffer()
+
+    ssd = SSD(nand=NAND(OUTPUT_DIR),
+              validator=Validator(),
+              output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"),
+              command_buffer=command_buffer
+              )
+
+    # 생성된 SSD.flush를 CommandBuffer의 callback 으로 연결
+    command_buffer.on_flush_callback = ssd.flush
+
     if args.command == "W":
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":
         ssd.read(str(args.lba))
     elif args.command == "E":
         ssd.erase(str(args.lba), args.size)
+    elif args.command == "F":
+        ssd.flush()
 
 
 if __name__ == "__main__":

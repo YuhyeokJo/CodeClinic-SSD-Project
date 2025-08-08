@@ -5,6 +5,7 @@ import shutil
 from dataclasses import dataclass
 from pytest_mock import MockerFixture
 
+from command_buffer.command_buffer import CommandBuffer
 from device import ssd
 from device.ssd import SSD, INITIALIZED_DATA, ERROR, OUTPUT_DIR, NAND, OutputWriter, Validator
 
@@ -19,9 +20,17 @@ class WriteCommand:
 @pytest.fixture
 def ssd_instance():
     shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
-    return SSD(nand=NAND(OUTPUT_DIR),
+    command_buffer = CommandBuffer()
+
+    ssd1 = SSD(nand=NAND(OUTPUT_DIR),
                validator=Validator(),
-               output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"))
+               output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"),
+               command_buffer=command_buffer
+               )
+
+    command_buffer.on_flush_callback = ssd1.flush
+
+    return ssd1
 
 
 def test_main_write_command(ssd_instance, mocker: MockerFixture):
@@ -122,6 +131,7 @@ def test_write_when_no_ssd_nand_text_create_then_write(ssd_instance):
 
     # act
     ssd_instance.write(cmd.lba, cmd.value)
+    ssd_instance.flush()
 
     with open(ssd_instance.nand.path, "r") as f:
         lines = f.read()
@@ -137,6 +147,7 @@ def test_write_when_ssd_nand_text_exists(ssd_instance):
 
     cmd2 = WriteCommand(cmd="W", lba='3', value='0xAAAABBBB')
     ssd_instance.write(cmd2.lba, cmd2.value)
+    ssd_instance.flush()
 
     with open(ssd_instance.nand.path, "r") as f:
         line1, line2 = f.readlines()
@@ -152,6 +163,7 @@ def test_write_when_ssd_nand_text_exists_multiple(ssd_instance):
         expected += f"{lba} {value}\n"
         ssd_instance.write(str(lba), value)
 
+    ssd_instance.flush()
     with open(ssd_instance.nand.path, "r") as f:
         result = f.read()
 
@@ -165,6 +177,7 @@ def test_write_when_same_lba(ssd_instance):
 
     cmd2 = WriteCommand(cmd="W", lba='2', value='0xFFFFFFFF')
     ssd_instance.write(cmd2.lba, cmd2.value)
+    ssd_instance.flush()
 
     data = dict()
     with open(ssd_instance.nand.path, "r") as f:
@@ -196,6 +209,7 @@ def test_read_creates_ssd_output_text_and_read_value(ssd_instance):
     읽은 데이터를 ssd_output.txt 파일에 기록한다.
     """
     ssd_instance.write('2', "0xAAAABBBB")
+    ssd_instance.flush()
     ssd_instance.read('2')
 
     data = {}
@@ -237,6 +251,8 @@ def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance)
      • 잘못된LBA 범위가입력되면ssd_output.txt에 ERROR가 기록된다.
     """
     ssd_instance.write('-1', "0xFFFFFFFF")
+    ssd_instance.flush()
+
     with open(ssd_instance.output_writer.output_file, "r") as f:
         actual = f.read()
 
@@ -245,6 +261,8 @@ def test_write_wrong_lba_print_ERROR_at_ssd_output_txt_if_not_0_99(ssd_instance)
 
 def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
     ssd_instance.erase('0', "11")
+    ssd_instance.flush()
+
     with open(ssd_instance.output_writer.output_file, "r") as f:
         actual = f.read()
 
@@ -261,6 +279,7 @@ def test_error_wrong_ssd_output_txt_if_size_not_0_10(ssd_instance):
 )
 def test_erase_error_wrong_ssd_output_txt_if_lba_size_exceed_99_or_under_0(ssd_instance, lba, size):
     ssd_instance.erase(lba, size)
+    ssd_instance.flush()
 
     with open(ssd_instance.output_writer.output_file, "r") as f:
         actual = f.read()
@@ -269,6 +288,7 @@ def test_erase_error_wrong_ssd_output_txt_if_lba_size_exceed_99_or_under_0(ssd_i
 
 def test_erase_success(ssd_instance):
     ssd_instance.erase('2', '4')
+    ssd_instance.flush()
 
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
@@ -278,6 +298,7 @@ def test_erase_success(ssd_instance):
 
 def test_erase_success2(ssd_instance):
     ssd_instance.erase('0', '-1')
+    ssd_instance.flush()
 
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
@@ -289,6 +310,7 @@ def test_write_and_erase_success(ssd_instance):
     ssd_instance.write('1', '0x12345678')
     ssd_instance.write('2', '0x12345678')
     ssd_instance.erase('2', '4')
+    ssd_instance.flush()
 
     with open(ssd_instance.nand.path, "r") as f:
         actual = f.read()
@@ -301,6 +323,7 @@ def test_write_and_erase_success(ssd_instance):
 )
 def test_erase_zero_size_success(ssd_instance, lba):
     ssd_instance.erase(lba, '0')
+    ssd_instance.flush()
 
     with pytest.raises(FileNotFoundError):
         with open(ssd_instance.nand.path, "r") as f:
