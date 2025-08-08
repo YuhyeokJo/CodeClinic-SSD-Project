@@ -212,8 +212,10 @@ class CommandBuffer:
         self._write_final_commands_to_buffer(final_cmds)
 
     def show_status(self):
+        files = []
         for f in sorted(os.listdir(self.output_dir)):
-            print(f" - {f}")
+            files.append(f)
+        return files
 
     def get_commands(self):
         commands = []
