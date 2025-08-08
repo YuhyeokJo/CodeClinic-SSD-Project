@@ -205,11 +205,17 @@ def main():
     except SystemExit as e:
         exit(1)
 
+    command_buffer = CommandBuffer()
+
     ssd = SSD(nand=NAND(OUTPUT_DIR),
               validator=Validator(),
               output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"),
-              command_buffer=CommandBuffer()
+              command_buffer=command_buffer
               )
+
+    # 생성된 SSD.flush를 CommandBuffer의 callback 으로 연결
+    command_buffer.on_flush_callback = ssd.flush
+
     if args.command == "W":
         ssd.write(str(args.lba), args.value)
     elif args.command == "R":

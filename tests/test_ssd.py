@@ -20,10 +20,17 @@ class WriteCommand:
 @pytest.fixture
 def ssd_instance():
     shutil.rmtree(OUTPUT_DIR, ignore_errors=True)
-    return SSD(nand=NAND(OUTPUT_DIR),
+    command_buffer = CommandBuffer()
+
+    ssd1 = SSD(nand=NAND(OUTPUT_DIR),
                validator=Validator(),
                output_writer=OutputWriter(OUTPUT_DIR / "ssd_output.txt"),
-               command_buffer=CommandBuffer())
+               command_buffer=command_buffer
+               )
+
+    command_buffer.on_flush_callback = ssd1.flush
+
+    return ssd1
 
 
 def test_main_write_command(ssd_instance, mocker: MockerFixture):
@@ -151,12 +158,12 @@ def test_write_when_ssd_nand_text_exists(ssd_instance):
 
 def test_write_when_ssd_nand_text_exists_multiple(ssd_instance):
     expected = ""
-    for lba in range(0, 100, 20):
+    for lba in range(100):
         value = f"0x{lba:0{8}x}"
         expected += f"{lba} {value}\n"
         ssd_instance.write(str(lba), value)
-    ssd_instance.flush()
 
+    ssd_instance.flush()
     with open(ssd_instance.nand.path, "r") as f:
         result = f.read()
 
