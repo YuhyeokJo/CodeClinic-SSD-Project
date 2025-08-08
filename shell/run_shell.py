@@ -23,9 +23,9 @@ class InteractiveShell:
     def __init__(self, driver: SSDDriver):
         self._driver = driver
         self._commands: dict[str, Command] = {}
-        self._register_builtin_commands()
         self._logger = Logger()
         self._logger.print("TestShell.__init__()", f"TEST SHELL START")
+        self._register_builtin_commands()
 
     def _register_builtin_commands(self):
         self._commands["write"] = Write(self._driver)
