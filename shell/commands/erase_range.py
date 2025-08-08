@@ -1,13 +1,8 @@
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND
 from shell.command_validator import EraseRangeValidator
 from shell.commands.erase import Erase
 from shell.driver import SSDDriver
-
-LBA_START = 0
-LBA_END = 99
-
-DONE = "[Erase Range] Done"
-INVALID_COMMAND = "INVALID COMMAND"
 
 
 class EraseRange(Command):

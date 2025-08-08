@@ -1,12 +1,9 @@
 import re
 from abc import ABC, abstractmethod
 
-# === Shared Constants ===
-VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{1,8}$")
-VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "flush", "exit", "help"}
-LBA_RANGE = range(0, 100)
-SIZE_RANGE = range(1, 11)
 VALID_LBA_PATTERN = re.compile(r"[1-9]?[0-9]")
+from shell.command_constants import LBA_RANGE, VALID_HEX_PATTERN, VALID_COMMANDS
+
 
 def is_valid_lba(lba: str) -> bool:
     return bool(VALID_LBA_PATTERN.fullmatch(lba)) and int(lba) in LBA_RANGE

@@ -1,13 +1,9 @@
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND, LBA_END
 from shell.command_validator import EraseValidator
 from shell.driver import SSDDriver
 
-LBA_START = 0
-LBA_END = 99
 ERASE_SIZE = 10
-
-INVALID_COMMAND = "INVALID COMMAND"
-
 
 class Erase(Command):
     def __init__(self, driver: SSDDriver):
@@ -28,8 +24,9 @@ class Erase(Command):
                     break
             else:
                 result = f"[{self.name}] Done"
-            self.log(result)
-            return result
+
+        self.log(result, 3)
+        return result
 
     def _split_range(self, lba: str, size: str):
         start = int(lba)

@@ -1,12 +1,7 @@
-import subprocess
-
-from unicodedata import normalize
-
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND
 from shell.command_validator import WriteValidator
 from shell.driver import SSDDriver
-
-INVALID_COMMAND = "INVALID COMMAND"
 
 
 class Write(Command):

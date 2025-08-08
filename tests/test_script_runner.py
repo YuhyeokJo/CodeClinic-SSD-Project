@@ -4,7 +4,6 @@ from pytest_mock import MockerFixture
 from shell.driver import SSDDriver
 from scripts.script_runner import ScriptRunner
 
-INVALID_COMMAND = "INVALID COMMAND"
 SCRIPT_PASS = "PASS"
 SCRIPT_FAIL = "FAIL"
 SCRIPT_1_GROUP_SIZE = 5

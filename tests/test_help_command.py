@@ -1,6 +1,6 @@
-import pytest
 from pytest_mock import MockerFixture
 
+from shell.command_constants import INVALID_COMMAND
 from shell.commands.help import Help
 from shell.driver import SSDDriver
 
@@ -61,11 +61,11 @@ def test_help_unknown_command_success(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
 
     help_command = Help(driver)
-    assert help_command.execute(['red']) == "INVALID COMMAND"
+    assert help_command.execute(['red']) == INVALID_COMMAND
 
 
 def test_help_empty_command_success(mocker: MockerFixture):
     driver = mocker.Mock(spec=SSDDriver)
 
     help_command = Help(driver)
-    assert help_command.execute([]) == "INVALID COMMAND"
+    assert help_command.execute([]) == INVALID_COMMAND
