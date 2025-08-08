@@ -26,5 +26,5 @@ class Write(Command):
                 result = f"[{self.name}] Fail"
             else:
                 result = f"[{self.name}] Done"
-        self.log(result)
+        self.log(result, 3)
         return result
