@@ -35,7 +35,6 @@ def test_write_correctly_after_normalize_hex(capsys, mocker: MockerFixture):
     assert write_command.execute(["3", "0x00000FD"]) == "[Write] Done"
 
 
-
 @pytest.mark.parametrize(
     "wrong_argument", [
         ["-1", "0x00000001"],
@@ -64,3 +63,13 @@ def test_write_command():
     writeCommand = Write(ssd_driver)
 
     assert f"[Write] Done" == writeCommand.execute(['10', "0x12345670"])
+
+
+def test_if_write_command_normalize_hex_data(mocker: MockerFixture):
+    mocked_ssd = mocker.Mock(spec=SSDDriver)
+    mocked_ssd.write.return_value = True
+    write_command = Write(mocked_ssd)
+
+    write_command.execute(["3", "0x010"])
+
+    mocked_ssd.write.assert_called_with("3", "0x00000010")
