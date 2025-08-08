@@ -29,11 +29,11 @@ class Logger:
         cls._instance = None
 
     def _get_formatted_time(self):
-        return datetime.now().strftime("%y.%m.%d %H:%M")
+        return datetime.now().strftime("%y.%m.%d %H:%M:%S")
 
     def _rotate_if_needed(self):
         if os.path.exists(self.log_file) and os.path.getsize(self.log_file) >= self.max_size:
-            ts = datetime.now().strftime("%y%m%d_%H%M")
+            ts = datetime.now().strftime("%y%m%d_%H%M%S")
             new_path = os.path.join(self.log_dir, f"until_{ts}.log")
             if os.path.exists(new_path):
                 os.remove(new_path)

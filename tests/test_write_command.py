@@ -1,8 +1,11 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from shell.command_constants import INVALID_COMMAND
 from shell.commands.write import Write
 from shell.driver import SSDDriver
+
+DONE = "[Write] Done"
 
 
 def test_write_correctly(capsys, mocker: MockerFixture):
@@ -31,8 +34,8 @@ def test_write_correctly_after_normalize_hex(capsys, mocker: MockerFixture):
     write_command = Write(mocked_ssd)
 
     # assert
-    assert write_command.execute(["3", "0x000001"]) == "[Write] Done"
-    assert write_command.execute(["3", "0x00000FD"]) == "[Write] Done"
+    assert write_command.execute(["3", "0x000001"]) == DONE
+    assert write_command.execute(["3", "0x00000FD"]) == DONE
 
 
 @pytest.mark.parametrize(
@@ -55,15 +58,14 @@ def test_write_wrongly_with_minus_lba(mocker: MockerFixture, wrong_argument):
         actual = write_command.execute(wrong_arg)
 
         # assert
-        assert actual == "INVALID COMMAND"
+        assert actual == INVALID_COMMAND
 
 
 def test_write_command():
     ssd_driver = SSDDriver()
-    writeCommand = Write(ssd_driver)
+    write_command = Write(ssd_driver)
 
-    assert f"[Write] Done" == writeCommand.execute(['10', "0x12345670"])
-
+    assert DONE == write_command.execute(['42', "0x12345678"])
 
 def test_if_write_command_normalize_hex_data(mocker: MockerFixture):
     mocked_ssd = mocker.Mock(spec=SSDDriver)
@@ -71,5 +73,4 @@ def test_if_write_command_normalize_hex_data(mocker: MockerFixture):
     write_command = Write(mocked_ssd)
 
     write_command.execute(["3", "0x010"])
-
     mocked_ssd.write.assert_called_with("3", "0x00000010")

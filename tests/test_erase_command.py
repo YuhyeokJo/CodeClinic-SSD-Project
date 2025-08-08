@@ -1,10 +1,10 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from shell.command_constants import INVALID_COMMAND
 from shell.commands.erase import Erase
 from shell.driver import SSDDriver
 
-INVALID_COMMAND = "INVALID COMMAND"
 DONE = "[Erase] Done"
 
 

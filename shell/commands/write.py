@@ -1,8 +1,5 @@
-import subprocess
-
-from unicodedata import normalize
-
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND
 from shell.command_validator import WriteValidator
 from shell.driver import SSDDriver
 
@@ -18,13 +15,16 @@ class Write(Command):
         return f"{hex_prefix}{hex_digits.zfill(8)}"
 
     def execute(self, args: list[str]) -> str:
-        if not self._validator.validate(args):
-            return "INVALID COMMAND"
         args = [args[0], self.normalize_hex_data(args[1])]
-        lba, data = args
-
-        result = self._driver.write(lba, data)
-        if not result:
-            return "INVALID COMMAND"
+        if not self._validator.validate(args):
+            result =  INVALID_COMMAND
         else:
-            return f"[Write] Done"
+            lba, data = args
+            result = self._driver.write(lba, data)
+
+            if not result:
+                result = f"[{self.name}] Fail"
+            else:
+                result = f"[{self.name}] Done"
+        self.log(result, 3)
+        return result

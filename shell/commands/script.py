@@ -8,7 +8,9 @@ class Script1(Command):
         self.script_runner = ScriptRunner(driver)
 
     def execute(self, args: list[str] = None) -> str:
-        return self.script_runner.full_write_and_read_compare()
+        result = self.script_runner.full_write_and_read_compare()
+        self.log(f"[{self.name}] Done", 1)
+        return result
 
 
 class Script2(Command):
@@ -16,7 +18,9 @@ class Script2(Command):
         self.script_runner = ScriptRunner(driver)
 
     def execute(self, args: list[str] = None) -> str:
-        return self.script_runner.partial_lba_write()
+        result = self.script_runner.partial_lba_write()
+        self.log(f"[{self.name}] Done", 1)
+        return result
 
 
 class Script3(Command):
@@ -24,7 +28,9 @@ class Script3(Command):
         self.script_runner = ScriptRunner(driver)
 
     def execute(self, args: list[str] = None) -> str:
-        return self.script_runner.write_read_aging()
+        result = self.script_runner.write_read_aging()
+        self.log(f"[{self.name}] Done", 1)
+        return result
 
 
 class Script4(Command):
@@ -32,4 +38,6 @@ class Script4(Command):
         self.script_runner = ScriptRunner(driver)
 
     def execute(self, args: list[str] = None) -> str:
-        return self.script_runner.erase_and_write_aging()
+        result = self.script_runner.erase_and_write_aging()
+        self.log(f"[{self.name}] Done", 1)
+        return result

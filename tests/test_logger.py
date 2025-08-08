@@ -32,7 +32,7 @@ def test_log_format(logger_with_tempdir):
         content = f.read()
         assert "TestLogger.test_log_format()" in content
         assert "포맷 테스트" in content
-        assert __import__("re").search(r"\[\d{2}\.\d{2}\.\d{2} \d{2}:\d{2}\]", content)
+        assert __import__("re").search(r"\[\d{2}\.\d{2}\.\d{2} \d{2}:\d{2}\:\d{2}\]", content)
 
 
 def test_log_rotation(logger_with_tempdir):

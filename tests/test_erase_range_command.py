@@ -1,11 +1,11 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from shell.command_constants import INVALID_COMMAND
 from shell.commands.erase_range import EraseRange
 from shell.driver import SSDDriver
 
-INVALID_COMMAND = "INVALID COMMAND"
-DONE = "[Erase Range] Done"
+DONE = "[EraseRange] Done"
 
 
 def test_erase_range_correctly(capsys, mocker: MockerFixture):

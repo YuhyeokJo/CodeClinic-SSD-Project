@@ -1,15 +1,8 @@
-import re
-
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND, LBA_START, LBA_END
 from shell.command_validator import FullWriteValidator
 from shell.commands.write import Write
 from shell.driver import SSDDriver
-
-LBA_START = 0
-LBA_END = 100
-
-FULL_WRITE_DONE = "[Full Write] Done"
-INVALID_COMMAND = "INVALID COMMAND"
 
 
 class FullWrite(Command):
@@ -18,14 +11,17 @@ class FullWrite(Command):
         self._validator = FullWriteValidator()
         self._write = Write(self._driver)
 
-    def execute(self, args: list[str]) -> str:
-        if not self._validator.validate(args):
-            return INVALID_COMMAND
-
-        data = args[0]
-
+    def execute_multiple_write(self, data):
         for LBA in range(LBA_START, LBA_END):
             if self._write.execute([str(LBA), data]) == INVALID_COMMAND:
                 return INVALID_COMMAND
+        return f"[{self.name}] Done"
 
-        return FULL_WRITE_DONE
+    def execute(self, args: list[str]) -> str:
+        if not self._validator.validate(args):
+            result = INVALID_COMMAND
+        else:
+            result = self.execute_multiple_write(args[0])
+
+        self.log(result, 2)
+        return result

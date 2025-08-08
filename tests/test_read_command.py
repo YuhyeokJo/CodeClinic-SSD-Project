@@ -1,8 +1,7 @@
+from shell.command_constants import INVALID_COMMAND
 from shell.commands.read import Read
 from shell.driver import SSDDriver
 from pathlib import Path
-
-INVALID_COMMAND = "INVALID COMMAND"
 
 
 def test_execute_with_no_args(mocker):

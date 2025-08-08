@@ -1,4 +1,5 @@
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND
 from shell.command_validator import ReadValidator
 from shell.driver import SSDDriver
 
@@ -10,8 +11,10 @@ class Read(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            return "INVALID COMMAND"
+            result = INVALID_COMMAND
+        else:
+            lba = args[0]
+            result = f"[{self.name}] LBA {lba}: {self._driver.read(lba)}"
 
-        lba = args[0]
-        result = self._driver.read(lba)
-        return f"[Read] LBA {lba}: {result}"
+        self.log(result, 3)
+        return result

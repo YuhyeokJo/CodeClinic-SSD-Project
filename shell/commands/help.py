@@ -1,4 +1,5 @@
 from shell.command import Command
+from shell.command_constants import INVALID_COMMAND
 from shell.command_validator import HelpValidator
 from shell.driver import SSDDriver
 
@@ -30,7 +31,10 @@ class Help(Command):
 
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
-            return "INVALID COMMAND"
+            result = INVALID_COMMAND
+        else:
+            cmd = args[0].lower()
+            result = self.format_help(cmd, self._help_map[cmd])
 
-        cmd = args[0].lower()
-        return self.format_help(cmd, self._help_map[cmd])
+        self.log(result, 1)
+        return result
