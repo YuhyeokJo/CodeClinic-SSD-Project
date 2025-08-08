@@ -18,17 +18,17 @@ class FullWrite(Command):
         self._validator = FullWriteValidator()
         self._write = Write(self._driver)
 
+    def execute_multiple_write(self, data):
+        for LBA in range(LBA_START, LBA_END):
+            if self._write.execute([str(LBA), data]) == INVALID_COMMAND:
+                return INVALID_COMMAND
+        return FULL_WRITE_DONE
+
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
             result = INVALID_COMMAND
-
         else:
-            data = args[0]
-            for LBA in range(LBA_START, LBA_END):
-                if self._write.execute([str(LBA), data]) == INVALID_COMMAND:
-                    result = INVALID_COMMAND
-                    break
-            result = FULL_WRITE_DONE
+            result = self.execute_multiple_write(args[0])
 
         self.log(result)
         return result

@@ -5,6 +5,7 @@ from shell.commands.read import Read
 from shell.driver import SSDDriver
 from shell.command import Command
 
+LBA_MAX = 100
 INVALID_COMMAND = "INVALID COMMAND"
 
 
@@ -14,15 +15,18 @@ class FullRead(Command):
         self._validator = FullReadValidator()
         self._read = Read(self.driver)
 
+    def excute_multiple_read(self):
+        result = ""
+        for lba in range(LBA_MAX):
+            result += f"\n {self._read.execute([str(lba)])}"
+        return result
+
     def execute(self, args: list[str]) -> str:
         if not self._validator.validate(args):
             result = INVALID_COMMAND
             self.log(result)
-
         else:
-            result = ""
-            for lba in range(100):
-                result += f"\n {self._read.execute([str(lba)])}"
+            result = self.excute_multiple_read()
             self.log(f"[{self.name}] Done")
 
         return result
