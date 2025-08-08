@@ -1,10 +1,10 @@
 import pytest
 from pytest_mock import MockerFixture
 
+from shell.command_constants import INVALID_COMMAND
 from shell.commands.flush import Flush
 from shell.driver import SSDDriver
 
-INVALID_COMMAND = "INVALID COMMAND"
 FLUSH_DONE = "[Flush] Done"
 
 
