@@ -1,5 +1,6 @@
 .venv
 .idea
 output
+buffer
 logs
 tests/logs

@@ -63,4 +63,4 @@ def test_write_command():
     ssd_driver = SSDDriver()
     writeCommand = Write(ssd_driver)
 
-    assert f"[Write] Done" == writeCommand.execute(['42', "0x12345678"])
+    assert f"[Write] Done" == writeCommand.execute(['10', "0x12345670"])
