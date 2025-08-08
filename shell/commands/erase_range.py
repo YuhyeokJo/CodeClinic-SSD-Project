@@ -20,8 +20,17 @@ class EraseRange(Command):
         if not self._validator.validate(args):
             return INVALID_COMMAND
         lba_start, lba_end = args
-        size = str(int(lba_end) - int(lba_start) + 1)
+        size = self._get_size(lba_end, lba_start)
         result = self._erase.execute([lba_start, size])
         if not result:
             return INVALID_COMMAND
         return DONE
+
+    def _get_size(self, lba_end, lba_start):
+        if (int(lba_end) - int(lba_start)) > 0:
+            size = str(int(lba_end) - int(lba_start) + 1)
+        elif (int(lba_end) - int(lba_start)) < 0:
+            size = str(int(lba_end) - int(lba_start) - 1)
+        else:
+            size = str(0)
+        return size
