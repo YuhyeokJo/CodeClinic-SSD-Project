@@ -1,5 +1,6 @@
 import sys
 import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../device')))
 
 import pytest
@@ -11,7 +12,6 @@ from pytest_mock import MockerFixture
 from device import ssd
 from device.ssd import SSD, INITIALIZED_DATA, ERROR, OUTPUT_DIR, NAND, OutputWriter, Validator
 from device.command_buffer import CommandBuffer
-
 
 
 @dataclass
@@ -34,6 +34,7 @@ def ssd_instance():
 
     command_buffer.on_flush_callback = ssd1.flush
     command_buffer.initialize_buffer()
+
     return ssd1
 
 
