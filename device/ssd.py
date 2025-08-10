@@ -8,8 +8,8 @@ import re
 ERROR = "ERROR"
 
 INITIALIZED_DATA = "0x00000000"
-MAX_LBA = 99
 MIN_LBA = 0
+MAX_LBA = 99
 LBA_RANGE = range(0, MAX_LBA + 1)
 
 MIN_SIZE = 0
@@ -91,8 +91,13 @@ class SSD(Device):
             self._write_error()
             return
 
-        data = self.nand.load()
-        result = data.get(lba, INITIALIZED_DATA)
+        if self.command_buffer:
+            if (result := self.command_buffer.fastread(lba)) is None:
+                data = self.nand.load()
+                result = data.get(lba, INITIALIZED_DATA)
+        else:
+            data = self.nand.load()
+            result = data.get(lba, INITIALIZED_DATA)
         self._write_output(f"{lba} {result}\n")
 
     def erase(self, lba: str, size: str) -> None:
@@ -188,6 +193,8 @@ def main():
     erase_parser = subparsers.add_parser("E", help="Erase")
     erase_parser.add_argument("lba", type=decimal_lba, help="LBA to Erase")
     erase_parser.add_argument("size", type=integer_size, help="Value to write")
+
+    subparsers.add_parser("F", help="Flush all data")
 
     try:
         args = parser.parse_args()
