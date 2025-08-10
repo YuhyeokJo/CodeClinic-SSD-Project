@@ -349,6 +349,7 @@ def test_erase_zero_size_success(ssd_instance, lba):
         with open(ssd_instance.nand.path, "r") as f:
             f.read()
 
+
 def test_no_console_output_if_use_correct_arg(ssd_instance, mocker: MockerFixture, capsys):
     mock_ssd = mocker.Mock(spec=SSD)
     mocker.patch('device.ssd.SSD', return_value=mock_ssd)
@@ -358,3 +359,14 @@ def test_no_console_output_if_use_correct_arg(ssd_instance, mocker: MockerFixtur
 
     assert capsys.readouterr().err == ""
     assert capsys.readouterr().out == ""
+
+
+def test_write_read(ssd_instance):
+    ssd_instance.write("10", "0xAABBCCDD")
+
+    ssd_instance.read("10")
+    with open(ssd_instance.output_writer.output_file, "r") as f:
+        result = f.read()
+
+    assert result == "10 0xAABBCCDD\n"
+
