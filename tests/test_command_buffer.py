@@ -289,3 +289,30 @@ def test_write_outside_merged_erase_range_2():
                                 "3_empty",
                                 "4_empty",
                                 "5_empty"]
+
+
+def test_write_invalidated_by_later_duplicate_erase():
+    cb = CommandBuffer()
+    cb.initialize_buffer()
+    cb.add_command("E", "1", "10")
+    cb.add_command("W", "5", "0x12345678")
+    cb.add_command("E", "1", "10")
+
+    assert cb.show_status() == ["1_E_1_10",
+                                "2_empty",
+                                "3_empty",
+                                "4_empty",
+                                "5_empty"]
+
+def test_erase_removes_previous_write_within_range():
+    cb = CommandBuffer()
+    cb.initialize_buffer()
+    cb.add_command("E", "1", "10")
+    cb.add_command("W", "5", "0x12345678")
+    cb.add_command("E", "1", "9")
+
+    assert cb.show_status() == ["1_E_1_10",
+                                "2_empty",
+                                "3_empty",
+                                "4_empty",
+                                "5_empty"]

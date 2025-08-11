@@ -105,6 +105,10 @@ class CommandBuffer:
         for cmd in commands:
             _, slot, cmd_type, lba, val = cmd
             if cmd_type == "W":
+                if commands[-1][2] == 'E':
+                    _, _, _, e_lba, e_size = commands[-1]
+                    if e_lba <= lba < e_lba + e_size:
+                        continue
                 latest_write[lba] = cmd
             elif cmd_type == "E":
                 size = val
