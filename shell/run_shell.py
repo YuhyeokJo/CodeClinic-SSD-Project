@@ -124,6 +124,7 @@ class BatchShell:
                 print("Pass", flush=True)
             else:
                 print("Fail", flush=True)
+                return
 
     def _register_builtin_script(self):
         self._registered_script["1_"] = self._registered_script["1_FullWriteAndReadCompare"] \

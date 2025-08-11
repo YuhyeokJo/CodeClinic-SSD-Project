@@ -185,8 +185,8 @@ def test_mocked_batch_shell_with_correct_file_and_multiple_script(tmp_path, caps
     patch_bash_shell__run_script = mocker.patch("shell.run_shell.BatchShell._run_script")
     patch_bash_shell__run_script.side_effect = [
         True, True,
-        False, False,
         True, True,
+        False, False,
     ]
 
     batch_shell = BatchShell(mocker.Mock(spec=SSDDriver))
@@ -210,10 +210,10 @@ def test_mocked_batch_shell_with_correct_file_and_multiple_script(tmp_path, caps
     assert actual == [
         "1_FullWriteAndReadCompare  ___  Run...Pass",
         "1_FullWriteAndReadCompare  ___  Run...Pass",
-        "2_PartialLBAWrite  ___  Run...Fail",
-        "2_PartialLBAWrite  ___  Run...Fail",
-        "3_WriteReadAging  ___  Run...Pass",
-        "3_WriteReadAging  ___  Run...Pass",
+        "2_PartialLBAWrite  ___  Run...Pass",
+        "2_PartialLBAWrite  ___  Run...Pass",
+        "3_WriteReadAging  ___  Run...Fail",
+        # the next script is not executed
     ]
 
 
