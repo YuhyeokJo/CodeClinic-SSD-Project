@@ -99,12 +99,16 @@ class CommandBuffer:
                 commands.append(parsed)
         return commands
 
-    def _prioritize_commands(self, commands):
+    def _select_effective_commands(self, commands):
         latest_write = {}
         latest_erase = {}
         for cmd in commands:
             _, slot, cmd_type, lba, val = cmd
             if cmd_type == "W":
+                if commands[-1][2] == 'E':
+                    _, _, _, e_lba, e_size = commands[-1]
+                    if e_lba <= lba < e_lba + e_size:
+                        continue
                 latest_write[lba] = cmd
             elif cmd_type == "E":
                 size = val
@@ -200,7 +204,7 @@ class CommandBuffer:
         commands = self._get_active_commands()
 
         # 2. LBA별로 최신 write, 최대 size의 erase 명령 저장
-        write_cmds, erase_cmds = self._prioritize_commands(commands)
+        write_cmds, erase_cmds = self._select_effective_commands(commands)
 
         # 3. erase 범위에 포함된 write 명령 중 더 늦은 슬롯의 write 명령은 무시
         final_writes = self._filter_obsolete_writes(write_cmds, erase_cmds)
