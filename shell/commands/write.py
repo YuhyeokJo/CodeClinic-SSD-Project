@@ -15,10 +15,11 @@ class Write(Command):
         return f"{hex_prefix}{hex_digits.zfill(8)}"
 
     def execute(self, args: list[str]) -> str:
-        args = [args[0], self.normalize_hex_data(args[1])]
         if not self._validator.validate(args):
             result =  INVALID_COMMAND
         else:
+            args = [args[0], self.normalize_hex_data(args[1])]
+
             lba, data = args
             result = self._driver.write(lba, data)
 
