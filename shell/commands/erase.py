@@ -1,5 +1,5 @@
 from shell.command import Command
-from shell.command_constants import INVALID_COMMAND, LBA_START, LBA_END, ERASE_SIZE
+from shell.command_constants import INVALID_COMMAND, LBA_START, LBA_MAX, ERASE_SIZE
 from shell.command_validator import EraseValidator
 from shell.driver import SSDDriver
 
@@ -36,8 +36,8 @@ class Erase(Command):
         if size > 0:
             while size > 0:
                 current_size = min(ERASE_SIZE, size)
-                if start + current_size - 1 > LBA_END:
-                    current_size = LBA_END - start + 1
+                if start + current_size - 1 > LBA_MAX:
+                    current_size = LBA_MAX - start + 1
                     if current_size <= 0:
                         break
                 result.append([str(start), str(current_size)])
