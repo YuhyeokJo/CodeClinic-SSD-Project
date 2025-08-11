@@ -68,7 +68,7 @@ class EraseRangeValidator(ArgumentValidator):
         if len(args) != 2:
             return False
         lba_start, lba_end = args
-        return is_valid_lba(lba_start) and lba_end.isdigit()
+        return is_valid_lba(lba_start) and bool(re.fullmatch(r"[0-9]+", lba_end))
 
 
 class FlushValidator(ArgumentValidator):

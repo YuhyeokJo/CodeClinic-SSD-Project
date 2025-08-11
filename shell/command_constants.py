@@ -1,7 +1,7 @@
 import re
 
 INVALID_COMMAND = "INVALID COMMAND"
-VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{8}$")
+VALID_HEX_PATTERN = re.compile(r"^0x[0-9A-Fa-f]{1,8}$")
 VALID_LBA_PATTERN = re.compile(r"[1-9]?[0-9]")
 VALID_COMMANDS = {"read", "write", "fullread", "fullwrite", "erase", "erase_range", "exit", "help"}
 LBA_START = 0
