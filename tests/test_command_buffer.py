@@ -304,6 +304,7 @@ def test_write_invalidated_by_later_duplicate_erase():
                                 "4_empty",
                                 "5_empty"]
 
+
 def test_erase_removes_previous_write_within_range():
     cb = CommandBuffer()
     cb.initialize_buffer()

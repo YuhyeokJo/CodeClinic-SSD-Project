@@ -99,7 +99,7 @@ class CommandBuffer:
                 commands.append(parsed)
         return commands
 
-    def _prioritize_commands(self, commands):
+    def _select_effective_commands(self, commands):
         latest_write = {}
         latest_erase = {}
         for cmd in commands:
