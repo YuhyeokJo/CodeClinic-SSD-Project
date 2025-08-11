@@ -24,10 +24,11 @@ def test_driver_write_mock(mocker):
 def test_driver_read():
     output_dir = Path(__file__).resolve().parent.parent / "output"
     ssd_nand_file = output_dir / "ssd_nand.txt"
+    ssd_driver = SSDDriver()
+    ssd_driver.flush()
     with open(ssd_nand_file, "w") as f:
         f.write("1 0x12345678")
 
-    ssd_driver = SSDDriver()
     result = ssd_driver.read("1")
 
     assert result == "0x12345678"
