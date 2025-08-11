@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import final
 
 MAX_COMMANDS = 5
 
@@ -117,21 +118,6 @@ class CommandBuffer:
 
         return list(latest_write.values()), list(latest_erase.values())
 
-    def _filter_obsolete_writes(self, write_cmds, erase_cmds):
-        final_writes = []
-        for w_cmd in write_cmds:
-            _, write_slot, _, write_lba, _ = w_cmd
-            is_erased = False
-            for e_cmd in erase_cmds:
-                _, erase_slot, _, erase_lba, erase_size = e_cmd
-                if erase_lba <= write_lba < erase_lba + erase_size and erase_slot > write_slot:
-                    is_erased = True
-                    break
-            if not is_erased:
-                final_writes.append(w_cmd)
-
-        return final_writes
-
     def _merge_erases(self, erase_cmds):
         intervals = sorted([(lba, lba + size - 1, slot) for _, slot, _, lba, size in erase_cmds])
 
@@ -203,16 +189,13 @@ class CommandBuffer:
         # 1. buffer 디렉터리 내 파일 이름에서 명령어 파싱 (empty 파일은 제외)
         commands = self._get_active_commands()
 
-        # 2. LBA별로 최신 write, 최대 size의 erase 명령 저장
-        write_cmds, erase_cmds = self._select_effective_commands(commands)
+        # 2. LBA별로 최신 write, 최대 size의 erase 명령 저장, 새로운 erase command 범위에 write가 있다면 무시
+        final_writes, erase_cmds = self._select_effective_commands(commands)
 
-        # 3. erase 범위에 포함된 write 명령 중 더 늦은 슬롯의 write 명령은 무시
-        final_writes = self._filter_obsolete_writes(write_cmds, erase_cmds)
-
-        # 4. erase 명령을 LBA 범위 기준으로 병합 (인접 구간 병합)
+        # 3. erase 명령을 LBA 범위 기준으로 병합 (인접 구간 병합)
         merged_erases = self._merge_erases(erase_cmds)
 
-        # 5. write LBA를 제외하지 않은 경우와 제외한 경우 각각의 erase 결과 생성
+        # 4. write LBA를 제외하지 않은 경우와 제외한 경우 각각의 erase 결과 생성
         write_lbas = {lba for _, _, _, lba, _ in final_writes}
 
         final_erases_with_writes = self._split_erases(merged_erases, write_lbas, exclude_writes=False)
@@ -221,17 +204,17 @@ class CommandBuffer:
         final_erases_without_writes = self._split_erases(merged_erases, write_lbas, exclude_writes=True)
         count_without_writes = len(final_erases_without_writes) + len(final_writes)
 
-        # 6. write 포함 명령 개수를 비교하여, 더 적은 개수인 erase 결과 선택
+        # 5. write 포함 명령 개수를 비교하여, 더 적은 개수인 erase 결과 선택
         final_erases = []
         if count_without_writes < count_with_writes:
             final_erases = final_erases_without_writes
         else:
             final_erases = final_erases_with_writes
 
-        # 7. 최종 명령 조합
+        # 6. 최종 명령 조합
         final_cmds = sorted(final_erases + final_writes, key=lambda x: (x[1], x[2], x[3]))  # slot, cmd_type, lba
 
-        # 8. 버퍼 디렉토리에 다시 작성
+        # 7. 버퍼 디렉토리에 다시 작성
         self._write_final_commands_to_buffer(final_cmds)
 
     def show_status(self):
